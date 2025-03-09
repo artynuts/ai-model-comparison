@@ -18,7 +18,7 @@ async function askGPT4(query: string) {
     model: "gpt-4",
     messages: [{ role: "user", content: query }],
   });
-  return completion.choices[0].message.content;
+  return completion.choices[0].message.content || "";
 }
 
 async function askClaude(query: string) {
@@ -27,7 +27,7 @@ async function askClaude(query: string) {
     max_tokens: 1024,
     messages: [{ role: "user", content: query }],
   });
-  return message.content[0].text;
+  return message.content[0].type === "text" ? message.content[0].text : "";
 }
 
 async function askPaLM(query: string) {
