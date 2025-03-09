@@ -27,7 +27,10 @@ export default function ComparisonForm() {
 
           if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.error || `${model} request failed`);
+            throw new Error(
+              errorData.error ||
+                `${model} request failed: ${response.status} ${response.statusText}`
+            );
           }
 
           const data = await response.json();
@@ -43,7 +46,9 @@ export default function ComparisonForm() {
             response: "",
             latency: Date.now() - startTime,
             error:
-              error instanceof Error ? error.message : "Unknown error occurred",
+              error instanceof Error
+                ? `Error with ${model}: ${error.message}`
+                : `Unknown error occurred with ${model}`,
           };
         }
       })

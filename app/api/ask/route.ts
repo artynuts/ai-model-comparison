@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -9,6 +10,8 @@ const openai = new OpenAI({
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
+
+const genAI = new GoogleGenerativeAI(process.env.PALM_API_KEY!);
 
 async function askGPT4(query: string) {
   const completion = await openai.chat.completions.create({
@@ -28,22 +31,21 @@ async function askClaude(query: string) {
 }
 
 async function askPaLM(query: string) {
-  const response = await fetch(
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.PALM_API_KEY}`,
-      },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: query }] }],
-      }),
-    }
-  );
+  try {
+    // For text-only input, use the gemini-pro model
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-  const data = await response.json();
-  return data.candidates[0].content.parts[0].text;
+    const result = await model.generateContent(query);
+    const response = await result.response;
+    return response.text();
+  } catch (error) {
+    console.error("Gemini API error:", error);
+    throw new Error(
+      error instanceof Error
+        ? error.message
+        : "Failed to get response from Gemini"
+    );
+  }
 }
 
 export async function POST(request: Request) {
@@ -72,7 +74,10 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("API Error:", error);
     return NextResponse.json(
-      { error: "Failed to process request" },
+      {
+        error:
+          error instanceof Error ? error.message : "Failed to process request",
+      },
       { status: 500 }
     );
   }
