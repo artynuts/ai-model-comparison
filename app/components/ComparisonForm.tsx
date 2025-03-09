@@ -12,7 +12,6 @@ export default function ComparisonForm() {
   });
 
   const compareModels = async (query: string): Promise<AIResponse[]> => {
-    // This is a mock implementation - replace with your actual API calls
     const models = ["GPT-4", "Claude", "PaLM"];
 
     return Promise.all(
@@ -20,14 +19,16 @@ export default function ComparisonForm() {
         const startTime = Date.now();
 
         try {
-          // Replace this with actual API calls to your AI models
           const response = await fetch("/api/ask", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ model, query }),
           });
 
-          if (!response.ok) throw new Error(`${model} request failed`);
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `${model} request failed`);
+          }
 
           const data = await response.json();
           return {
@@ -36,6 +37,7 @@ export default function ComparisonForm() {
             latency: Date.now() - startTime,
           };
         } catch (error) {
+          console.error(`${model} error:`, error);
           return {
             modelName: model,
             response: "",
