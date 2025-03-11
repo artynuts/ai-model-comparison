@@ -41,7 +41,7 @@ A web application that allows you to compare responses from multiple AI models s
 1. Clone the repository:
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/artynuts/ai-model-comparison.git
 cd ai-model-comparison
 ```
 
