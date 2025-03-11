@@ -18,8 +18,8 @@ const MODELS = {
     version: "claude-3-opus-20240229",
     description: "Latest Claude model",
   },
-  PaLM: {
-    id: "PaLM",
+  Gemini: {
+    id: "Gemini",
     name: "Gemini Flash",
     provider: "Google",
     version: "gemini-2.0-flash",
@@ -47,17 +47,17 @@ async function askGPT4(query: string) {
 
 async function askClaude(query: string) {
   const message = await anthropic.messages.create({
-    model: MODELS.Claude.version,
+    model: MODELS["Claude"].version,
     max_tokens: 1024,
     messages: [{ role: "user", content: query }],
   });
   return message.content[0].type === "text" ? message.content[0].text : "";
 }
 
-async function askPaLM(query: string) {
+async function askGemini(query: string) {
   try {
     const model = genAI.getGenerativeModel({
-      model: MODELS.PaLM.version,
+      model: MODELS["Gemini"].version,
     });
 
     const result = await model.generateContent(query);
@@ -93,8 +93,8 @@ export async function POST(request: Request) {
       case "Claude":
         response = await askClaude(query);
         break;
-      case "PaLM":
-        response = await askPaLM(query);
+      case "Gemini":
+        response = await askGemini(query);
         break;
       default:
         return NextResponse.json(

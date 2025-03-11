@@ -11,7 +11,7 @@ export default function ComparisonForm() {
     responses: [],
   });
 
-  const models = ["GPT-4", "Claude", "PaLM"];
+  const models = ["GPT-4", "Claude", "Gemini"];
 
   const compareModels = async (query: string): Promise<AIResponse[]> => {
     return Promise.all(
