@@ -42,7 +42,7 @@ A web application that allows you to compare responses from multiple AI models s
 
 ```bash
 git clone <your-repo-url>
-cd ai-comparison-cursor
+cd ai-model-comparison
 ```
 
 2. Install dependencies:
@@ -89,7 +89,7 @@ npm run dev
 ## Project Structure
 
 ```
-ai-comparison-cursor/
+ai-model-comparison/
 ├── app/
 │   ├── api/           # API routes
 │   ├── components/    # React components
