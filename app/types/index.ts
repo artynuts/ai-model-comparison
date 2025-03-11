@@ -1,5 +1,8 @@
 export interface AIResponse {
   modelName: string;
+  provider: string;
+  version: string;
+  description: string;
   response: string;
   latency: number;
   error?: string;

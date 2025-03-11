@@ -4,6 +4,38 @@ import { useState } from "react";
 import { AIResponse, ComparisonState } from "../types";
 import MarkdownResponse from "./MarkdownResponse";
 
+interface ModelInfo {
+  id: string;
+  name: string;
+  provider: string;
+  version: string;
+  description: string;
+}
+
+const MODELS: ModelInfo[] = [
+  {
+    id: "GPT-4",
+    name: "GPT-4",
+    provider: "OpenAI",
+    version: "gpt-4",
+    description: "Most capable OpenAI model",
+  },
+  {
+    id: "Claude",
+    name: "Claude 3 Opus",
+    provider: "Anthropic",
+    version: "claude-3-opus-20240229",
+    description: "Latest Claude model",
+  },
+  {
+    id: "PaLM",
+    name: "Gemini Flash",
+    provider: "Google",
+    version: "gemini-2.0-flash",
+    description: "Quick response model",
+  },
+];
+
 export default function ComparisonForm() {
   const [query, setQuery] = useState("");
   const [comparison, setComparison] = useState<ComparisonState>({
@@ -12,43 +44,40 @@ export default function ComparisonForm() {
   });
 
   const compareModels = async (query: string): Promise<AIResponse[]> => {
-    const models = ["GPT-4", "Claude", "PaLM"];
-
     return Promise.all(
-      models.map(async (model) => {
+      MODELS.map(async (model) => {
         const startTime = Date.now();
-
         try {
           const response = await fetch("/api/ask", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ model, query }),
+            body: JSON.stringify({ model: model.id, query }),
           });
 
           if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(
-              errorData.error ||
-                `${model} request failed: ${response.status} ${response.statusText}`
-            );
+            throw new Error(errorData.error || `${model.name} request failed`);
           }
 
           const data = await response.json();
           return {
-            modelName: model,
+            modelName: model.name,
+            provider: model.provider,
+            version: model.version,
+            description: model.description,
             response: data.response,
             latency: Date.now() - startTime,
           };
         } catch (error) {
-          console.error(`${model} error:`, error);
           return {
-            modelName: model,
+            modelName: model.name,
+            provider: model.provider,
+            version: model.version,
+            description: model.description,
             response: "",
             latency: Date.now() - startTime,
             error:
-              error instanceof Error
-                ? `Error with ${model}: ${error.message}`
-                : `Unknown error occurred with ${model}`,
+              error instanceof Error ? error.message : "Unknown error occurred",
           };
         }
       })
@@ -97,10 +126,17 @@ export default function ComparisonForm() {
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {comparison.responses.map((response, index) => (
             <div key={index} className="p-4 border rounded-lg shadow-sm">
-              <h3 className="font-bold text-lg mb-2">{response.modelName}</h3>
-              <p className="text-sm text-gray-500 mb-2">
-                Latency: {response.latency}ms
-              </p>
+              <div className="mb-4">
+                <h3 className="font-bold text-lg">{response.modelName}</h3>
+                <p className="text-sm text-gray-500">{response.provider}</p>
+                <p className="text-xs text-gray-400 font-mono">
+                  {response.version}
+                </p>
+                <p className="text-xs text-gray-400">{response.description}</p>
+                <p className="text-sm text-gray-500 mt-2">
+                  Latency: {response.latency}ms
+                </p>
+              </div>
               {response.error ? (
                 <p className="text-red-500">{response.error}</p>
               ) : (
