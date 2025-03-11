@@ -1,6 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import { useEffect, useRef } from "react";
 import MarkdownResponse from "../components/MarkdownResponse";
 import { useHistory } from "../context/HistoryContext";
 
@@ -8,6 +9,16 @@ export default function History() {
   const searchParams = useSearchParams();
   const selectedQuery = searchParams.get("query");
   const { history } = useHistory();
+  const selectedRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (selectedQuery && selectedRef.current) {
+      selectedRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [selectedQuery]);
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -17,6 +28,7 @@ export default function History() {
         {history.map((item, historyIndex) => (
           <div
             key={historyIndex}
+            ref={selectedQuery === item.query ? selectedRef : null}
             className={`border rounded-lg p-4 ${
               selectedQuery === item.query ? "ring-2 ring-blue-500" : ""
             }`}
