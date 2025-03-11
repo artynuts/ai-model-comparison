@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AIResponse, ComparisonState } from "../types";
 import MarkdownResponse from "./MarkdownResponse";
+import { useHistory } from "../context/HistoryContext";
 
 interface QueryHistory {
   query: string;
@@ -16,7 +17,7 @@ export default function ComparisonForm() {
     isLoading: false,
     responses: [],
   });
-  const [history, setHistory] = useState<QueryHistory[]>([]);
+  const { addToHistory } = useHistory();
 
   const models = ["GPT-4", "Claude", "Gemini"];
 
@@ -72,16 +73,7 @@ export default function ComparisonForm() {
     try {
       const responses = await compareModels(query);
       setComparison({ isLoading: false, responses });
-
-      // Add to history
-      setHistory((prev) => [
-        {
-          query,
-          timestamp: Date.now(),
-          responses,
-        },
-        ...prev,
-      ]);
+      addToHistory(query, responses);
     } catch (error) {
       console.error("Comparison failed:", error);
       setComparison({
@@ -133,59 +125,6 @@ export default function ComparisonForm() {
               )}
             </div>
           ))}
-        </div>
-      )}
-
-      {history.length > 0 && (
-        <div className="mt-12 border-t pt-8">
-          <h2 className="text-xl font-bold mb-4">Query History</h2>
-          <div className="space-y-8">
-            {history.map((item, historyIndex) => (
-              <div key={historyIndex} className="border rounded-lg p-4">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <p className="font-mono bg-gray-100 p-2 rounded">
-                      {item.query}
-                    </p>
-                    <p className="text-sm text-gray-500 mt-1">
-                      {new Date(item.timestamp).toLocaleString()}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => {
-                      setQuery(item.query);
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
-                    className="text-blue-500 hover:text-blue-600"
-                  >
-                    Reuse Query
-                  </button>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {item.responses.map((response, responseIndex) => (
-                    <div key={responseIndex} className="border rounded p-3">
-                      <div className="mb-2">
-                        <h4 className="font-semibold">{response.modelName}</h4>
-                        <p className="text-xs text-gray-500">
-                          {response.provider}
-                        </p>
-                        <p className="text-xs text-gray-400">
-                          Latency: {response.latency}ms
-                        </p>
-                      </div>
-                      {response.error ? (
-                        <p className="text-red-500 text-sm">{response.error}</p>
-                      ) : (
-                        <div className="text-sm">
-                          <MarkdownResponse content={response.response} />
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       )}
     </div>
