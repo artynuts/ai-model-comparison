@@ -4,38 +4,6 @@ import { useState } from "react";
 import { AIResponse, ComparisonState } from "../types";
 import MarkdownResponse from "./MarkdownResponse";
 
-interface ModelInfo {
-  id: string;
-  name: string;
-  provider: string;
-  version: string;
-  description: string;
-}
-
-const MODELS: ModelInfo[] = [
-  {
-    id: "GPT-4",
-    name: "GPT-4",
-    provider: "OpenAI",
-    version: "gpt-4",
-    description: "Most capable OpenAI model",
-  },
-  {
-    id: "Claude",
-    name: "Claude 3 Opus",
-    provider: "Anthropic",
-    version: "claude-3-opus-20240229",
-    description: "Latest Claude model",
-  },
-  {
-    id: "PaLM",
-    name: "Gemini Flash",
-    provider: "Google",
-    version: "gemini-2.0-flash",
-    description: "Quick response model",
-  },
-];
-
 export default function ComparisonForm() {
   const [query, setQuery] = useState("");
   const [comparison, setComparison] = useState<ComparisonState>({
@@ -43,37 +11,41 @@ export default function ComparisonForm() {
     responses: [],
   });
 
+  const models = ["GPT-4", "Claude", "PaLM"];
+
   const compareModels = async (query: string): Promise<AIResponse[]> => {
     return Promise.all(
-      MODELS.map(async (model) => {
+      models.map(async (model) => {
         const startTime = Date.now();
         try {
           const response = await fetch("/api/ask", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ model: model.id, query }),
+            body: JSON.stringify({ model, query }),
           });
 
           if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.error || `${model.name} request failed`);
+            throw new Error(errorData.error || `${model} request failed`);
           }
 
           const data = await response.json();
           return {
-            modelName: model.name,
-            provider: model.provider,
-            version: model.version,
-            description: model.description,
+            modelName: data.name,
+            id: data.id,
+            provider: data.provider,
+            version: data.version,
+            description: data.description,
             response: data.response,
             latency: Date.now() - startTime,
           };
         } catch (error) {
           return {
-            modelName: model.name,
-            provider: model.provider,
-            version: model.version,
-            description: model.description,
+            modelName: model,
+            id: model,
+            provider: "Unknown",
+            version: "Unknown",
+            description: "Error occurred",
             response: "",
             latency: Date.now() - startTime,
             error:

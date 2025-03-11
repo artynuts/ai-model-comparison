@@ -1,5 +1,6 @@
 export interface AIResponse {
   modelName: string;
+  id: string;
   provider: string;
   version: string;
   description: string;

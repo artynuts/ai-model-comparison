@@ -3,6 +3,30 @@ import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
+const MODELS = {
+  "GPT-4": {
+    id: "GPT-4",
+    name: "GPT-4",
+    provider: "OpenAI",
+    version: "gpt-4",
+    description: "Most capable OpenAI model",
+  },
+  Claude: {
+    id: "Claude",
+    name: "Claude 3 Opus",
+    provider: "Anthropic",
+    version: "claude-3-opus-20240229",
+    description: "Latest Claude model",
+  },
+  PaLM: {
+    id: "PaLM",
+    name: "Gemini Flash",
+    provider: "Google",
+    version: "gemini-2.0-flash",
+    description: "Quick response model",
+  },
+};
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -51,6 +75,14 @@ async function askPaLM(query: string) {
 export async function POST(request: Request) {
   try {
     const { model, query } = await request.json();
+    const modelInfo = MODELS[model as keyof typeof MODELS];
+
+    if (!modelInfo) {
+      return NextResponse.json(
+        { error: "Model not supported" },
+        { status: 400 }
+      );
+    }
 
     let response: string;
     switch (model) {
@@ -70,7 +102,14 @@ export async function POST(request: Request) {
         );
     }
 
-    return NextResponse.json({ response });
+    return NextResponse.json({
+      response,
+      id: modelInfo.id,
+      name: modelInfo.name,
+      provider: modelInfo.provider,
+      version: modelInfo.version,
+      description: modelInfo.description,
+    });
   } catch (error) {
     console.error("API Error:", error);
     return NextResponse.json(
