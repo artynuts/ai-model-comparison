@@ -56,7 +56,7 @@ npm install
 ```env
 OPENAI_API_KEY=your_openai_key
 ANTHROPIC_API_KEY=your_anthropic_key
-PALM_API_KEY=your_google_api_key
+GEMINI_API_KEY=your_google_api_key
 ```
 
 4. Run the development server:
