@@ -39,7 +39,7 @@ const genAI = new GoogleGenerativeAI(process.env.PALM_API_KEY!);
 
 async function askGPT4(query: string) {
   const completion = await openai.chat.completions.create({
-    model: "gpt-4",
+    model: MODELS["GPT-4"].version,
     messages: [{ role: "user", content: query }],
   });
   return completion.choices[0].message.content || "";
@@ -47,7 +47,7 @@ async function askGPT4(query: string) {
 
 async function askClaude(query: string) {
   const message = await anthropic.messages.create({
-    model: "claude-3-opus-20240229",
+    model: MODELS.Claude.version,
     max_tokens: 1024,
     messages: [{ role: "user", content: query }],
   });
@@ -56,8 +56,9 @@ async function askClaude(query: string) {
 
 async function askPaLM(query: string) {
   try {
-    // For text-only input, use the gemini-pro model
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({
+      model: MODELS.PaLM.version,
+    });
 
     const result = await model.generateContent(query);
     const response = await result.response;
