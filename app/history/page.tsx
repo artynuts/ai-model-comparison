@@ -2,9 +2,8 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
-import MarkdownResponse from "../components/MarkdownResponse";
+import QueryResponseCard from "../components/QueryResponseCard";
 import DeleteButton from "../components/DeleteButton";
-import ThumbsRating from "../components/ThumbsRating";
 import { useHistory } from "../context/HistoryContext";
 
 export default function History() {
@@ -51,44 +50,17 @@ export default function History() {
                 className="text-gray-500"
               />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="space-y-4">
               {item.responses.map((response, responseIndex) => (
-                <div key={responseIndex} className="border rounded p-3">
-                  <div className="mb-2">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h4 className="font-semibold">{response.modelName}</h4>
-                        <p className="text-xs text-gray-500">
-                          {response.provider}
-                        </p>
-                        <p className="text-xs text-gray-400">
-                          Latency: {response.latency}ms
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  {response.error ? (
-                    <p className="text-red-500 text-sm">{response.error}</p>
-                  ) : (
-                    <>
-                      <div className="text-sm">
-                        <MarkdownResponse content={response.response} />
-                      </div>
-                      <div className="mt-4 pt-4 border-t">
-                        <ThumbsRating
-                          rating={response.rating}
-                          onChange={(rating) =>
-                            updateResponseRating(
-                              item.timestamp,
-                              responseIndex,
-                              rating
-                            )
-                          }
-                        />
-                      </div>
-                    </>
-                  )}
-                </div>
+                <QueryResponseCard
+                  key={responseIndex}
+                  response={response}
+                  variant="compact"
+                  onRatingChange={(rating) =>
+                    rating &&
+                    updateResponseRating(item.timestamp, responseIndex, rating)
+                  }
+                />
               ))}
             </div>
           </div>

@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { AIResponse, ComparisonState } from "../types";
-import MarkdownResponse from "./MarkdownResponse";
-import ThumbsRating from "./ThumbsRating";
+import QueryResponseCard from "./QueryResponseCard";
 import { useHistory } from "../context/HistoryContext";
 
 interface QueryHistory {
@@ -126,38 +125,11 @@ export default function ComparisonForm() {
       {comparison.responses.length > 0 && (
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {comparison.responses.map((response, index) => (
-            <div key={index} className="p-4 border rounded-lg shadow-sm">
-              <div className="mb-4">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-bold text-lg">{response.modelName}</h3>
-                    <p className="text-sm text-gray-500">{response.provider}</p>
-                    <p className="text-xs text-gray-400 font-mono">
-                      {response.version}
-                    </p>
-                    <p className="text-xs text-gray-400">
-                      {response.description}
-                    </p>
-                    <p className="text-sm text-gray-500 mt-2">
-                      Latency: {response.latency}ms
-                    </p>
-                  </div>
-                </div>
-              </div>
-              {response.error ? (
-                <p className="text-red-500">{response.error}</p>
-              ) : (
-                <>
-                  <MarkdownResponse content={response.response} />
-                  <div className="mt-4 pt-4 border-t">
-                    <ThumbsRating
-                      rating={response.rating}
-                      onChange={(rating) => handleRatingChange(index, rating)}
-                    />
-                  </div>
-                </>
-              )}
-            </div>
+            <QueryResponseCard
+              key={index}
+              response={response}
+              onRatingChange={(rating) => handleRatingChange(index, rating)}
+            />
           ))}
         </div>
       )}
