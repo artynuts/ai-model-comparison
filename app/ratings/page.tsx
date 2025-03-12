@@ -41,12 +41,12 @@ export default function RatingsPage() {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full border-collapse border border-gray-200 rounded-lg">
+        <table className="min-w-full border-collapse border border-gray-200 rounded-lg bg-white">
           <thead>
             <tr>
               <th
                 rowSpan={2}
-                className="text-left p-3 bg-gray-50 border-b border-r border-gray-200 font-medium text-gray-700"
+                className="text-left p-3 border-b border-r border-gray-200 font-medium text-gray-700"
               >
                 Query
               </th>
