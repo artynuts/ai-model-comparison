@@ -19,12 +19,12 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <div className="w-64 h-screen border-r p-4 flex flex-col">
+    <div className="sticky top-0 h-screen overflow-y-auto border-r p-4 flex flex-col">
       <div className="mb-8">
         <h1 className="text-xl font-bold">AI Comparison</h1>
       </div>
 
-      <nav className="flex-1">
+      <nav className="flex-1 overflow-y-auto">
         <Link
           href="/"
           className={`block mb-2 p-2 rounded ${

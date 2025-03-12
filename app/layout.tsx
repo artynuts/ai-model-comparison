@@ -18,9 +18,11 @@ export default function RootLayout({
     <html lang="en">
       <body className={GeistSans.className}>
         <HistoryProvider>
-          <div className="flex">
-            <Sidebar />
-            <main className="flex-1 min-h-screen p-8">{children}</main>
+          <div className="flex min-h-screen">
+            <div className="w-64 flex-shrink-0">
+              <Sidebar />
+            </div>
+            <main className="flex-1 p-8 overflow-y-auto">{children}</main>
           </div>
         </HistoryProvider>
       </body>
