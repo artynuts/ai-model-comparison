@@ -1,6 +1,7 @@
 "use client";
 
 import { ResponseRating, RATING_CATEGORIES } from "../types";
+import ThumbsIcon from "./ThumbsIcon";
 
 interface ThumbsRatingProps {
   rating?: ResponseRating;
@@ -70,15 +71,7 @@ function RatingCategory({
           }`}
           title="Thumbs up"
         >
-          <svg
-            className="w-5 h-5"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            stroke={value === true ? "#86efac" : "none"}
-            strokeWidth={1.5}
-          >
-            <path d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
-          </svg>
+          <ThumbsIcon direction="up" selected={value === true} />
         </button>
         <button
           onClick={() => onChange(false)}
@@ -89,15 +82,7 @@ function RatingCategory({
           }`}
           title="Thumbs down"
         >
-          <svg
-            className="w-5 h-5 rotate-180"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            stroke={value === false ? "#fca5a5" : "none"}
-            strokeWidth={1.5}
-          >
-            <path d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
-          </svg>
+          <ThumbsIcon direction="down" selected={value === false} />
         </button>
       </div>
     </div>
