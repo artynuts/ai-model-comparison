@@ -41,31 +41,38 @@ export default function RatingsPage() {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full border-collapse">
+        <table className="min-w-full border-collapse border border-gray-200 rounded-lg">
           <thead>
             <tr>
               <th
                 rowSpan={2}
-                className="text-left p-3 bg-gray-50 border-b font-medium text-gray-700"
+                className="text-left p-3 bg-gray-50 border-b border-r border-gray-200 font-medium text-gray-700"
               >
                 Query
               </th>
-              {modelNames.map((modelName) => (
+              {modelNames.map((modelName, i) => (
                 <th
                   key={modelName}
                   colSpan={RATING_CATEGORIES.length}
-                  className="p-3 bg-gray-50 border-b font-medium text-gray-700 text-center"
+                  className={`p-3 bg-gray-50 border-b border-gray-200 font-medium text-gray-700 text-center ${
+                    i < modelNames.length - 1 ? "border-r border-gray-200" : ""
+                  }`}
                 >
                   <div className="whitespace-nowrap">{modelName}</div>
                 </th>
               ))}
             </tr>
             <tr>
-              {modelNames.map((modelName) =>
-                RATING_CATEGORIES.map((category) => (
+              {modelNames.map((modelName, i) =>
+                RATING_CATEGORIES.map((category, j) => (
                   <th
                     key={`${modelName}-${category.key}`}
-                    className="p-2 bg-gray-50 border-b font-medium text-gray-700 text-center"
+                    className={`p-2 bg-gray-50 border-b border-gray-200 font-medium text-gray-700 text-center ${
+                      i < modelNames.length - 1 &&
+                      j === RATING_CATEGORIES.length - 1
+                        ? "border-r border-gray-200"
+                        : ""
+                    }`}
                     title={category.description}
                   >
                     <div className="text-xs text-gray-500">
@@ -78,8 +85,11 @@ export default function RatingsPage() {
           </thead>
           <tbody>
             {history.map((item, index) => (
-              <tr key={index} className="border-b hover:bg-gray-50">
-                <td className="p-3">
+              <tr
+                key={index}
+                className="border-b border-gray-100 hover:bg-gray-50"
+              >
+                <td className="p-3 border-r border-gray-200">
                   <Link
                     href={`/history?query=${encodeURIComponent(item.query)}`}
                     className="text-blue-600 hover:text-blue-800 transition-colors"
@@ -87,16 +97,21 @@ export default function RatingsPage() {
                     {item.query}
                   </Link>
                 </td>
-                {modelNames.map((modelName) => {
+                {modelNames.map((modelName, i) => {
                   const response = item.responses.find(
                     (r) => r.modelName === modelName
                   );
-                  return RATING_CATEGORIES.map((category) => (
+                  return RATING_CATEGORIES.map((category, j) => (
                     <td
                       key={`${modelName}-${category.key}`}
                       className={`p-3 text-center ${getRatingColor(
                         response?.rating?.[category.key] ?? null
-                      )}`}
+                      )} ${
+                        i < modelNames.length - 1 &&
+                        j === RATING_CATEGORIES.length - 1
+                          ? "border-r border-gray-200"
+                          : ""
+                      }`}
                     >
                       {getRatingSymbol(
                         response?.rating?.[category.key] ?? null
