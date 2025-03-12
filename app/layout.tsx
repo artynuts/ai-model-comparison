@@ -18,11 +18,20 @@ export default function RootLayout({
     <html lang="en">
       <body className={GeistSans.className}>
         <HistoryProvider>
-          <div className="flex min-h-screen">
-            <div className="w-64 flex-shrink-0">
-              <Sidebar />
+          <div className="flex flex-col min-h-screen">
+            <header className="bg-white border-b sticky top-0 z-10">
+              <div className="max-w-screen-2xl mx-auto px-8 py-4">
+                <h1 className="text-2xl font-bold text-gray-900">
+                  AI Model Comparison
+                </h1>
+              </div>
+            </header>
+            <div className="flex flex-1">
+              <div className="w-64 flex-shrink-0">
+                <Sidebar />
+              </div>
+              <main className="flex-1 p-8 overflow-y-auto">{children}</main>
             </div>
-            <main className="flex-1 p-8 overflow-y-auto">{children}</main>
           </div>
         </HistoryProvider>
       </body>
