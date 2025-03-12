@@ -56,17 +56,17 @@ function RatingCategory({
   onChange,
 }: RatingCategoryProps) {
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-1">
       <div className="w-24 text-sm text-gray-600" title={description}>
         {label}
       </div>
       <div className="flex gap-2">
         <button
           onClick={() => onChange(true)}
-          className={`p-1.5 rounded-full transition-colors ${
+          className={`transition-colors ${
             value === true
-              ? "bg-green-100 text-green-600"
-              : "hover:bg-gray-100 text-gray-400"
+              ? "text-green-600"
+              : "text-gray-400 hover:text-gray-600"
           }`}
           title="Thumbs up"
         >
@@ -86,10 +86,10 @@ function RatingCategory({
         </button>
         <button
           onClick={() => onChange(false)}
-          className={`p-1.5 rounded-full transition-colors ${
+          className={`transition-colors ${
             value === false
-              ? "bg-red-100 text-red-600"
-              : "hover:bg-gray-100 text-gray-400"
+              ? "text-red-600"
+              : "text-gray-400 hover:text-gray-600"
           }`}
           title="Thumbs down"
         >
@@ -156,7 +156,7 @@ export default function ThumbsRating({
           )}
         </div>
       )}
-      <div className="space-y-3">
+      <div className="space-y-1">
         {RATING_CATEGORIES.map((category) => (
           <RatingCategory
             key={category.key}
