@@ -14,10 +14,10 @@ export default function ThumbsIcon({
   const rotateClass = isDown ? "rotate-180" : "";
   const fillColor = selected
     ? isDown
-      ? "text-red-100"
-      : "text-green-100"
-    : "text-gray-300";
-  const strokeColor = selected ? (isDown ? "#fca5a5" : "#86efac") : "none";
+      ? "text-red-100 hover:text-red-600"
+      : "text-green-100 hover:text-green-600"
+    : "text-gray-300 hover:text-gray-600";
+  const strokeColor = selected ? (isDown ? "#ef4444" : "#22c55e") : "none";
 
   return (
     <svg
