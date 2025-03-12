@@ -14,10 +14,12 @@ export default function History() {
 
   useEffect(() => {
     if (selectedQuery && selectedRef.current) {
-      selectedRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
+      setTimeout(() => {
+        selectedRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 100);
     }
   }, [selectedQuery]);
 
