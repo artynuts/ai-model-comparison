@@ -16,19 +16,32 @@ interface RatingCategoryProps {
   onChange: (value: boolean) => void;
 }
 
-function calculateAverageRating(rating?: ResponseRating): string {
-  if (!rating) return "Not rated";
+function calculateAverageRating(rating?: ResponseRating): {
+  text: string;
+  percentage: number;
+} {
+  if (!rating) return { text: "Not rated", percentage: 0 };
 
   const values = [rating.accuracy, rating.relevance, rating.completeness];
   const validValues = values.filter(
     (value): value is boolean => value !== null
   );
 
-  if (validValues.length === 0) return "Not rated";
+  if (validValues.length === 0) return { text: "Not rated", percentage: 0 };
 
   const positiveCount = validValues.filter(Boolean).length;
   const percentage = (positiveCount / validValues.length) * 100;
-  return `${Math.round(percentage)}% positive`;
+  return {
+    text: `${Math.round(percentage)}% positive`,
+    percentage: Math.round(percentage),
+  };
+}
+
+function getAverageRatingStyles(percentage: number): string {
+  if (percentage === 0) return "bg-gray-100 text-gray-600"; // Not rated
+  if (percentage > 75) return "bg-green-100 text-green-700";
+  if (percentage < 50) return "bg-red-100 text-red-700";
+  return "bg-yellow-100 text-yellow-700"; // Between 50 and 75
 }
 
 function RatingCategory({
@@ -110,6 +123,9 @@ export default function ThumbsRating({
     });
   };
 
+  const averageRating = calculateAverageRating(rating);
+  const ratingStyles = getAverageRatingStyles(averageRating.percentage);
+
   return (
     <div>
       {(showLabel || showAverage) && (
@@ -120,9 +136,11 @@ export default function ThumbsRating({
             </p>
           )}
           {showAverage && (
-            <p className="text-sm text-gray-600">
-              {calculateAverageRating(rating)}
-            </p>
+            <div
+              className={`px-3 py-1 rounded-full font-medium ${ratingStyles}`}
+            >
+              {averageRating.text}
+            </div>
           )}
         </div>
       )}
