@@ -25,7 +25,13 @@ type RatingResult = {
 function calculateAverageRating(rating?: ResponseRating): RatingResult {
   if (!rating) return { text: "Not rated", percentage: 0, isRated: false };
 
-  const values = [rating.accuracy, rating.relevance, rating.completeness];
+  const values = [
+    rating.accuracy,
+    rating.relevance,
+    rating.completeness,
+    rating.concise,
+    rating.unbiased,
+  ];
   const validValues = values.filter(
     (value): value is boolean => value !== null
   );
@@ -113,7 +119,13 @@ function RatingCategory({
 }
 
 export default function ThumbsRating({
-  rating = { accuracy: null, relevance: null, completeness: null },
+  rating = {
+    accuracy: null,
+    relevance: null,
+    completeness: null,
+    concise: null,
+    unbiased: null,
+  },
   onChange,
   showAverage = true,
   showLabel = true,
@@ -172,6 +184,18 @@ export default function ThumbsRating({
           description="Was anything missing?"
           value={rating.completeness}
           onChange={(value) => handleCategoryChange("completeness", value)}
+        />
+        <RatingCategory
+          label="Concise"
+          description="Was the response straight to the point?"
+          value={rating.concise}
+          onChange={(value) => handleCategoryChange("concise", value)}
+        />
+        <RatingCategory
+          label="Unbiased"
+          description="Did you detect any bias in the response?"
+          value={rating.unbiased}
+          onChange={(value) => handleCategoryChange("unbiased", value)}
         />
       </div>
     </div>

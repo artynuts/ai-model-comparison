@@ -2,6 +2,8 @@ export interface ResponseRating {
   accuracy: boolean | null;
   relevance: boolean | null;
   completeness: boolean | null;
+  concise: boolean | null;
+  unbiased: boolean | null;
 }
 
 export interface AIResponse {
