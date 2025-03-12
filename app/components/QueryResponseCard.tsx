@@ -19,11 +19,11 @@ export default function QueryResponseCard({
 
   return (
     <div
-      className={`bg-white border border-blue-100 shadow-[0_2px_8px_0_rgba(0,0,0,0.1)] rounded-lg ${
-        isCompact ? "p-3" : "p-4"
+      className={`bg-gray-50 border border-blue-100 shadow-[0_2px_8px_0_rgba(0,0,0,0.1)] rounded-lg ${
+        isCompact ? "p-0" : "p-0"
       }`}
     >
-      <div className="mb-4">
+      <div className="mb-4 p-3">
         <div className="flex justify-between items-start">
           <div>
             <h3 className={`font-bold ${isCompact ? "text-base" : "text-lg"}`}>
@@ -48,11 +48,17 @@ export default function QueryResponseCard({
         <p className="text-red-500">{response.error}</p>
       ) : (
         <>
-          <div className={`${isCompact ? "text-sm" : ""}`}>
-            <MarkdownResponse content={response.response} />
+          <div
+            className={`${
+              isCompact ? "text-sm" : ""
+            } bg-blue-50 border-y border-blue-100`}
+          >
+            <div className="p-3">
+              <MarkdownResponse content={response.response} />
+            </div>
           </div>
           {onRatingChange && (
-            <div className="mt-4 pt-4 border-t border-blue-50">
+            <div className="mt-4 pt-4 border-t border-blue-50 p-3">
               <ThumbsRating
                 rating={response.rating}
                 onChange={onRatingChange}
