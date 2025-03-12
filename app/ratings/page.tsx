@@ -121,10 +121,10 @@ export default function RatingsPage() {
               <tr
                 key={index}
                 className={`${
-                  index === history.length - 1 ? "" : "border-b border-gray-100"
+                  index === history.length - 1 ? "" : "border-b border-gray-200"
                 } hover:bg-gray-50`}
               >
-                <td className="p-3 border-r border-gray-200">
+                <td className="p-2 border-r border-gray-200 text-sm">
                   <Link
                     href={`/history?query=${encodeURIComponent(item.query)}`}
                     className="text-blue-600 hover:text-blue-800 transition-colors"
@@ -139,7 +139,7 @@ export default function RatingsPage() {
                   return RATING_CATEGORIES.map((category, j) => (
                     <td
                       key={`${modelName}-${category.key}`}
-                      className={`p-3 text-center ${getRatingColor(
+                      className={`p-2 text-center text-sm ${getRatingColor(
                         response?.rating?.[category.key] ?? null
                       )} ${
                         i < modelNames.length - 1 &&
@@ -204,10 +204,10 @@ export default function RatingsPage() {
               <tr
                 key={index}
                 className={`${
-                  index === history.length - 1 ? "" : "border-b border-gray-100"
+                  index === history.length - 1 ? "" : "border-b border-gray-200"
                 } hover:bg-gray-50`}
               >
-                <td className="p-3 border-r border-gray-200">
+                <td className="p-2 border-r border-gray-200 text-sm">
                   <Link
                     href={`/history?query=${encodeURIComponent(item.query)}`}
                     className="text-blue-600 hover:text-blue-800 transition-colors"
@@ -223,7 +223,7 @@ export default function RatingsPage() {
                     return (
                       <td
                         key={`${category.key}-${modelName}`}
-                        className={`p-3 text-center ${getRatingColor(
+                        className={`p-2 text-center text-sm ${getRatingColor(
                           response?.rating?.[category.key] ?? null
                         )} ${
                           i === modelNames.length - 1
