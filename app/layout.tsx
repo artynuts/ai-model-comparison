@@ -19,7 +19,7 @@ export default function RootLayout({
       <body className={GeistSans.className}>
         <HistoryProvider>
           <div className="flex flex-col min-h-screen">
-            <header className="bg-white border-b sticky top-0 z-10">
+            <header className="bg-white border-b border-gray-200 shadow-[0_1px_5px_0_rgba(0,0,0,0.05)] sticky top-0 z-10">
               <div className="max-w-screen-2xl mx-auto px-8 py-4">
                 <h1 className="text-2xl font-bold text-gray-900">
                   AI Model Comparison

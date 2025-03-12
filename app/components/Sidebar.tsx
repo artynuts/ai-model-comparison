@@ -19,7 +19,7 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <div className="sticky top-0 h-screen overflow-y-auto border-r p-4 flex flex-col">
+    <div className="sticky top-0 h-screen overflow-y-auto border-r border-gray-200 shadow-[1px_0_5px_0_rgba(0,0,0,0.05)] p-4 flex flex-col">
       <div className="mb-8">
         <h1 className="text-xl font-bold">AI Comparison</h1>
       </div>
