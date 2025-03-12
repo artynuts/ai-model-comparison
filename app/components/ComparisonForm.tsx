@@ -103,7 +103,7 @@ export default function ComparisonForm() {
   };
 
   return (
-    <div className="w-full max-w-4xl">
+    <div className="w-full max-w-6xl">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <textarea
