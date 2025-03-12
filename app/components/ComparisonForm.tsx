@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AIResponse, ComparisonState } from "../types";
-import QueryResponseCard from "./QueryResponseCard";
+import QueryGroup from "./QueryGroup";
 import { useHistory } from "../context/HistoryContext";
 
 interface QueryHistory {
@@ -109,7 +109,7 @@ export default function ComparisonForm() {
           <textarea
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full p-4 border rounded-lg h-32 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-4 bg-white border border-gray-200 shadow-[1px_0_5px_0_rgba(0,0,0,0.05)] rounded-lg h-32 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Enter your query here..."
           />
         </div>
@@ -123,14 +123,13 @@ export default function ComparisonForm() {
       </form>
 
       {comparison.responses.length > 0 && (
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {comparison.responses.map((response, index) => (
-            <QueryResponseCard
-              key={index}
-              response={response}
-              onRatingChange={(rating) => handleRatingChange(index, rating)}
-            />
-          ))}
+        <div className="mt-8">
+          <QueryGroup
+            query={query}
+            timestamp={comparison.timestamp}
+            responses={comparison.responses}
+            onRatingChange={handleRatingChange}
+          />
         </div>
       )}
     </div>

@@ -2,8 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
-import QueryResponseCard from "../components/QueryResponseCard";
-import DeleteButton from "../components/DeleteButton";
+import QueryGroup from "../components/QueryGroup";
 import { useHistory } from "../context/HistoryContext";
 
 export default function History() {
@@ -32,37 +31,19 @@ export default function History() {
           <div
             key={historyIndex}
             ref={selectedQuery === item.query ? selectedRef : null}
-            className={`bg-white border border-gray-200 shadow-[1px_0_5px_0_rgba(0,0,0,0.05)] rounded-lg p-4 ${
-              selectedQuery === item.query ? "ring-2 ring-blue-500" : ""
-            }`}
           >
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <p className="font-mono bg-gray-100 p-2 rounded">
-                  {item.query}
-                </p>
-                <p className="text-sm text-gray-500 mt-1">
-                  {new Date(item.timestamp).toLocaleString()}
-                </p>
-              </div>
-              <DeleteButton
-                onDelete={() => deleteFromHistory(item.timestamp)}
-                className="text-gray-500"
-              />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {item.responses.map((response, responseIndex) => (
-                <QueryResponseCard
-                  key={responseIndex}
-                  response={response}
-                  variant="compact"
-                  onRatingChange={(rating) =>
-                    rating &&
-                    updateResponseRating(item.timestamp, responseIndex, rating)
-                  }
-                />
-              ))}
-            </div>
+            <QueryGroup
+              query={item.query}
+              timestamp={item.timestamp}
+              responses={item.responses}
+              onDelete={() => deleteFromHistory(item.timestamp)}
+              onRatingChange={(responseIndex, rating) =>
+                rating &&
+                updateResponseRating(item.timestamp, responseIndex, rating)
+              }
+              isSelected={selectedQuery === item.query}
+              variant="compact"
+            />
           </div>
         ))}
       </div>
