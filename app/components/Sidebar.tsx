@@ -26,7 +26,7 @@ export default function Sidebar() {
         <Link
           href="/"
           className={`block mb-2 p-2 rounded transition-colors outline-none focus-visible:border focus-visible:border-blue-200 ${
-            pathname === "/" ? "bg-blue-50 text-blue-600" : "hover:bg-gray-200"
+            pathname === "/" ? "bg-blue-50 text-blue-600" : "hover:bg-gray-50"
           }`}
         >
           Compare Models
@@ -36,10 +36,20 @@ export default function Sidebar() {
           className={`block mb-2 p-2 rounded transition-colors outline-none focus-visible:border focus-visible:border-blue-200 ${
             pathname === "/history"
               ? "bg-blue-50 text-blue-600"
-              : "hover:bg-gray-200"
+              : "hover:bg-gray-50"
           }`}
         >
           Full History
+        </Link>
+        <Link
+          href="/ratings"
+          className={`block mb-2 p-2 rounded transition-colors outline-none focus-visible:border focus-visible:border-blue-200 ${
+            pathname === "/ratings"
+              ? "bg-blue-50 text-blue-600"
+              : "hover:bg-gray-50"
+          }`}
+        >
+          Ratings Summary
         </Link>
 
         <div className="mt-6">
