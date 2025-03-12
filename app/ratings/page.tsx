@@ -102,7 +102,7 @@ export default function RatingsPage() {
                       : "border-b border-gray-200"
                   } hover:bg-gray-50`}
                 >
-                  <td className="p-2 border-r border-gray-200 text-sm">
+                  <td className="p-2 border-r border-gray-200 text-xs">
                     <Link
                       href={`/history?query=${encodeURIComponent(item.query)}`}
                       className="text-blue-600 hover:text-blue-800 transition-colors"
@@ -187,7 +187,7 @@ export default function RatingsPage() {
                       : "border-b border-gray-200"
                   } hover:bg-gray-50`}
                 >
-                  <td className="p-2 border-r border-gray-200 text-sm">
+                  <td className="p-2 border-r border-gray-200 text-xs">
                     <Link
                       href={`/history?query=${encodeURIComponent(item.query)}`}
                       className="text-blue-600 hover:text-blue-800 transition-colors"
