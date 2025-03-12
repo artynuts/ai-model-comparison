@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useHistory } from "../context/HistoryContext";
@@ -17,6 +18,7 @@ interface SidebarProps {
 export default function Sidebar() {
   const { history, deleteFromHistory } = useHistory();
   const pathname = usePathname();
+  const [isRecentQueriesOpen, setIsRecentQueriesOpen] = useState(true);
 
   return (
     <div className="sticky top-0 h-screen overflow-y-auto border-r border-gray-200 shadow-[1px_0_5px_0_rgba(0,0,0,0.05)] p-4 flex flex-col">
@@ -41,10 +43,32 @@ export default function Sidebar() {
         </Link>
 
         <div className="mt-6">
-          <h2 className="text-sm font-semibold text-gray-500 mb-2">
-            Recent Queries
-          </h2>
-          <div className="space-y-2">
+          <button
+            onClick={() => setIsRecentQueriesOpen(!isRecentQueriesOpen)}
+            className="flex items-center justify-between w-full text-sm font-semibold text-gray-500 mb-2 hover:text-gray-700"
+          >
+            <span>Recent Queries</span>
+            <svg
+              className={`w-4 h-4 transition-transform ${
+                isRecentQueriesOpen ? "rotate-180" : ""
+              }`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+          <div
+            className={`space-y-2 overflow-hidden transition-all duration-200 ${
+              isRecentQueriesOpen ? "max-h-96" : "max-h-0"
+            }`}
+          >
             {history.map((item, index) => (
               <div
                 key={index}
