@@ -10,6 +10,12 @@ A web application that allows you to compare responses from multiple AI models s
 - Query history with easy access to past comparisons
 - Responsive design for desktop and mobile
 - Dark/light mode support
+- Enhanced UI with:
+  - Sticky header for easy navigation
+  - Light blue response sections for better readability
+  - Consistent card styling with subtle borders
+  - Full-width layout for better space utilization
+  - Improved query history display
 
 ## Supported Models
 
