@@ -4,12 +4,29 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 import MarkdownResponse from "../components/MarkdownResponse";
 import DeleteButton from "../components/DeleteButton";
+import ThumbsRating from "../components/ThumbsRating";
 import { useHistory } from "../context/HistoryContext";
+import { ResponseRating } from "../types";
+
+function calculateAverageRating(rating?: ResponseRating): string {
+  if (!rating) return "Not rated";
+
+  const values = [rating.accuracy, rating.relevance, rating.completeness];
+  const validValues = values.filter(
+    (value): value is boolean => value !== null
+  );
+
+  if (validValues.length === 0) return "Not rated";
+
+  const positiveCount = validValues.filter(Boolean).length;
+  const percentage = (positiveCount / validValues.length) * 100;
+  return `${Math.round(percentage)}% positive`;
+}
 
 export default function History() {
   const searchParams = useSearchParams();
   const selectedQuery = searchParams.get("query");
-  const { history, deleteFromHistory } = useHistory();
+  const { history, deleteFromHistory, updateResponseRating } = useHistory();
   const selectedRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -54,18 +71,44 @@ export default function History() {
               {item.responses.map((response, responseIndex) => (
                 <div key={responseIndex} className="border rounded p-3">
                   <div className="mb-2">
-                    <h4 className="font-semibold">{response.modelName}</h4>
-                    <p className="text-xs text-gray-500">{response.provider}</p>
-                    <p className="text-xs text-gray-400">
-                      Latency: {response.latency}ms
-                    </p>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h4 className="font-semibold">{response.modelName}</h4>
+                        <p className="text-xs text-gray-500">
+                          {response.provider}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          Latency: {response.latency}ms
+                        </p>
+                      </div>
+                      <div className="text-xs text-gray-600 font-medium">
+                        {calculateAverageRating(response.rating)}
+                      </div>
+                    </div>
                   </div>
                   {response.error ? (
                     <p className="text-red-500 text-sm">{response.error}</p>
                   ) : (
-                    <div className="text-sm">
-                      <MarkdownResponse content={response.response} />
-                    </div>
+                    <>
+                      <div className="text-sm">
+                        <MarkdownResponse content={response.response} />
+                      </div>
+                      <div className="mt-4 pt-4 border-t">
+                        <p className="text-sm font-medium text-gray-700 mb-2">
+                          Rate this response:
+                        </p>
+                        <ThumbsRating
+                          rating={response.rating}
+                          onChange={(rating) =>
+                            updateResponseRating(
+                              item.timestamp,
+                              responseIndex,
+                              rating
+                            )
+                          }
+                        />
+                      </div>
+                    </>
                   )}
                 </div>
               ))}
