@@ -6,6 +6,7 @@ interface ThumbsRatingProps {
   rating?: ResponseRating;
   onChange: (rating: ResponseRating) => void;
   showAverage?: boolean;
+  showLabel?: boolean;
 }
 
 interface RatingCategoryProps {
@@ -97,6 +98,7 @@ export default function ThumbsRating({
   rating = { accuracy: null, relevance: null, completeness: null },
   onChange,
   showAverage = true,
+  showLabel = true,
 }: ThumbsRatingProps) {
   const handleCategoryChange = (
     category: keyof ResponseRating,
@@ -110,9 +112,18 @@ export default function ThumbsRating({
 
   return (
     <div>
-      {showAverage && (
-        <div className="text-sm text-gray-600 font-medium mb-3">
-          {calculateAverageRating(rating)}
+      {(showLabel || showAverage) && (
+        <div className="flex justify-between items-center mb-3">
+          {showLabel && (
+            <p className="text-sm font-medium text-gray-700">
+              Rate this response:
+            </p>
+          )}
+          {showAverage && (
+            <p className="text-sm text-gray-600">
+              {calculateAverageRating(rating)}
+            </p>
+          )}
         </div>
       )}
       <div className="space-y-3">

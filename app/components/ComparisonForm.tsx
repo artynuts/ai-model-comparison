@@ -142,9 +142,6 @@ export default function ComparisonForm() {
                 <>
                   <MarkdownResponse content={response.response} />
                   <div className="mt-4 pt-4 border-t">
-                    <p className="text-sm font-medium text-gray-700 mb-2">
-                      Rate this response:
-                    </p>
                     <ThumbsRating
                       rating={response.rating}
                       onChange={(rating) => handleRatingChange(index, rating)}
