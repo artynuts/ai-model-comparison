@@ -120,7 +120,9 @@ export default function RatingsPage() {
             {history.map((item, index) => (
               <tr
                 key={index}
-                className="border-b border-gray-100 hover:bg-gray-50"
+                className={`${
+                  index === history.length - 1 ? "" : "border-b border-gray-100"
+                } hover:bg-gray-50`}
               >
                 <td className="p-3 border-r border-gray-200">
                   <Link
@@ -201,7 +203,9 @@ export default function RatingsPage() {
             {history.map((item, index) => (
               <tr
                 key={index}
-                className="border-b border-gray-100 hover:bg-gray-50"
+                className={`${
+                  index === history.length - 1 ? "" : "border-b border-gray-100"
+                } hover:bg-gray-50`}
               >
                 <td className="p-3 border-r border-gray-200">
                   <Link
