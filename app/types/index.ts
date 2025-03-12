@@ -1,3 +1,9 @@
+export interface ResponseRating {
+  accuracy: boolean | null;
+  relevance: boolean | null;
+  completeness: boolean | null;
+}
+
 export interface AIResponse {
   modelName: string;
   id: string;
@@ -7,6 +13,7 @@ export interface AIResponse {
   response: string;
   latency: number;
   error?: string;
+  rating?: ResponseRating;
 }
 
 export interface ComparisonState {

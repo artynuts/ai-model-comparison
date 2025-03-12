@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AIResponse, ComparisonState } from "../types";
 import MarkdownResponse from "./MarkdownResponse";
+import ThumbsRating from "./ThumbsRating";
 import { useHistory } from "../context/HistoryContext";
 
 interface QueryHistory {
@@ -83,6 +84,17 @@ export default function ComparisonForm() {
     }
   };
 
+  const handleRatingChange = (index: number, rating: AIResponse["rating"]) => {
+    setComparison((prev) => {
+      const newResponses = [...prev.responses];
+      newResponses[index] = {
+        ...newResponses[index],
+        rating,
+      };
+      return { ...prev, responses: newResponses };
+    });
+  };
+
   return (
     <div className="w-full max-w-4xl">
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -121,7 +133,18 @@ export default function ComparisonForm() {
               {response.error ? (
                 <p className="text-red-500">{response.error}</p>
               ) : (
-                <MarkdownResponse content={response.response} />
+                <>
+                  <MarkdownResponse content={response.response} />
+                  <div className="mt-4 pt-4 border-t">
+                    <p className="text-sm font-medium text-gray-700 mb-2">
+                      Rate this response:
+                    </p>
+                    <ThumbsRating
+                      rating={response.rating}
+                      onChange={(rating) => handleRatingChange(index, rating)}
+                    />
+                  </div>
+                </>
               )}
             </div>
           ))}
