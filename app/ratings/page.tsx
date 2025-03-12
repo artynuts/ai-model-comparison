@@ -73,7 +73,8 @@ export default function RatingsPage() {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full border-collapse border border-gray-200 rounded-lg bg-white">
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">By Model</h2>
+        <table className="min-w-full border-collapse border border-gray-200 rounded-lg bg-white mb-8">
           <thead>
             <tr>
               <th
@@ -151,6 +152,88 @@ export default function RatingsPage() {
                     </td>
                   ));
                 })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          By Category
+        </h2>
+        <table className="min-w-full border-collapse border border-gray-200 rounded-lg bg-white">
+          <thead>
+            <tr>
+              <th
+                rowSpan={2}
+                className="text-left p-3 border-b border-r border-gray-200 font-medium text-gray-700"
+              >
+                Query
+              </th>
+              {RATING_CATEGORIES.map((category) => (
+                <th
+                  key={category.key}
+                  colSpan={modelNames.length}
+                  className="p-3 bg-gray-50 border-b border-gray-200 font-medium text-gray-700 text-center border-r border-gray-200"
+                  title={category.description}
+                >
+                  <div className="whitespace-nowrap">{category.label}</div>
+                </th>
+              ))}
+            </tr>
+            <tr>
+              {RATING_CATEGORIES.map((category) =>
+                modelNames.map((modelName, i) => (
+                  <th
+                    key={`${category.key}-${modelName}`}
+                    className={`p-2 bg-gray-50 border-b border-gray-200 font-medium text-gray-700 text-center ${
+                      i === modelNames.length - 1
+                        ? "border-r border-gray-200"
+                        : ""
+                    }`}
+                  >
+                    <div className="text-xs text-gray-500">{modelName}</div>
+                  </th>
+                ))
+              )}
+            </tr>
+          </thead>
+          <tbody>
+            {history.map((item, index) => (
+              <tr
+                key={index}
+                className="border-b border-gray-100 hover:bg-gray-50"
+              >
+                <td className="p-3 border-r border-gray-200">
+                  <Link
+                    href={`/history?query=${encodeURIComponent(item.query)}`}
+                    className="text-blue-600 hover:text-blue-800 transition-colors"
+                  >
+                    {item.query}
+                  </Link>
+                </td>
+                {RATING_CATEGORIES.map((category) =>
+                  modelNames.map((modelName, i) => {
+                    const response = item.responses.find(
+                      (r) => r.modelName === modelName
+                    );
+                    return (
+                      <td
+                        key={`${category.key}-${modelName}`}
+                        className={`p-3 text-center ${getRatingColor(
+                          response?.rating?.[category.key] ?? null
+                        )} ${
+                          i === modelNames.length - 1
+                            ? "border-r border-gray-200"
+                            : ""
+                        }`}
+                      >
+                        {getRatingSymbol(
+                          response?.rating?.[category.key] ?? null
+                        )}
+                      </td>
+                    );
+                  })
+                )}
               </tr>
             ))}
           </tbody>
