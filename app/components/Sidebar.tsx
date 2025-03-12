@@ -25,18 +25,18 @@ export default function Sidebar() {
       <nav className="flex-1 overflow-y-auto">
         <Link
           href="/"
-          className={`block mb-2 p-2 rounded ${
-            pathname === "/" ? "bg-blue-50 text-blue-600" : "hover:bg-gray-50"
+          className={`block mb-2 p-2 rounded transition-colors outline-none focus-visible:border focus-visible:border-blue-200 ${
+            pathname === "/" ? "bg-blue-50 text-blue-600" : "hover:bg-gray-200"
           }`}
         >
           Compare Models
         </Link>
         <Link
           href="/history"
-          className={`block mb-2 p-2 rounded ${
+          className={`block mb-2 p-2 rounded transition-colors outline-none focus-visible:border focus-visible:border-blue-200 ${
             pathname === "/history"
               ? "bg-blue-50 text-blue-600"
-              : "hover:bg-gray-50"
+              : "hover:bg-gray-200"
           }`}
         >
           Full History
@@ -45,7 +45,7 @@ export default function Sidebar() {
         <div className="mt-6">
           <button
             onClick={() => setIsRecentQueriesOpen(!isRecentQueriesOpen)}
-            className="flex items-center justify-between w-full text-sm font-semibold text-gray-500 mb-2 hover:text-gray-700"
+            className="flex items-center justify-between w-full text-sm font-semibold text-gray-500 mb-2 p-2 rounded transition-colors outline-none focus-visible:border focus-visible:border-blue-200 hover:text-gray-700 hover:bg-gray-200"
           >
             <span>Recent Queries</span>
             <svg
@@ -70,13 +70,10 @@ export default function Sidebar() {
             }`}
           >
             {history.map((item, index) => (
-              <div
-                key={index}
-                className="group relative block p-2 text-sm hover:bg-gray-50 rounded"
-              >
+              <div key={index} className="group relative block text-sm rounded">
                 <Link
                   href={`/history?query=${encodeURIComponent(item.query)}`}
-                  className="block"
+                  className="block p-2 rounded transition-colors outline-none focus-visible:border focus-visible:border-blue-200 hover:bg-gray-200"
                 >
                   <p className="truncate pr-6">{item.query}</p>
                   <p className="text-xs text-gray-500">
