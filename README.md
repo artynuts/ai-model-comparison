@@ -16,6 +16,12 @@ A web application that allows you to compare responses from multiple AI models s
   - Consistent card styling with subtle borders
   - Full-width layout for better space utilization
   - Improved query history display
+- Rating system for responses:
+  - Thumbs up/down ratings for multiple categories
+  - Rating summary tables by model and category
+  - Visual indicators with color-coded backgrounds
+  - Interactive rating controls with hover effects
+  - Percentage-based rating summaries
 
 ## Supported Models
 
@@ -78,8 +84,10 @@ npm run dev
 1. Enter your query in the text area
 2. Click "Compare Models" to send the query to all AI models
 3. View the responses side by side
-4. Access your query history in the sidebar
-5. Click on past queries to view previous comparisons
+4. Rate responses using thumbs up/down for different categories
+5. Access your query history in the sidebar
+6. View rating summaries in the dedicated ratings page
+7. Click on past queries to view previous comparisons
 
 ## Tech Stack
 
@@ -99,13 +107,34 @@ ai-model-comparison/
 ├── app/
 │   ├── api/           # API routes
 │   ├── components/    # React components
-│   ├── context/       # React context
-│   ├── history/       # History page
+│   │   ├── ThumbsIcon.tsx    # Shared rating icon component
+│   │   ├── ThumbsRating.tsx  # Rating control component
+│   │   └── ...
+│   ├── context/      # React context
+│   │   ├── HistoryContext.tsx  # Query history management
+│   │   └── ...
+│   ├── history/      # History page
+│   ├── ratings/      # Ratings summary page
 │   ├── types/        # TypeScript types
 │   └── page.tsx      # Main page
 ├── public/           # Static assets
-└── package.json     # Dependencies and scripts
+└── package.json      # Dependencies and scripts
 ```
+
+## Rating Categories
+
+The application supports rating responses across multiple categories:
+
+- Accuracy
+- Clarity
+- Completeness
+- Relevance
+- Usefulness
+
+Each category can be rated with thumbs up or down, and ratings are summarized in:
+
+- Per-model view: Shows ratings grouped by AI model
+- Per-category view: Shows ratings grouped by category
 
 ## Contributing
 
