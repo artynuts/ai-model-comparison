@@ -16,31 +16,36 @@ interface RatingCategoryProps {
   onChange: (value: boolean) => void;
 }
 
-function calculateAverageRating(rating?: ResponseRating): {
+type RatingResult = {
   text: string;
   percentage: number;
-} {
-  if (!rating) return { text: "Not rated", percentage: 0 };
+  isRated: boolean;
+};
+
+function calculateAverageRating(rating?: ResponseRating): RatingResult {
+  if (!rating) return { text: "Not rated", percentage: 0, isRated: false };
 
   const values = [rating.accuracy, rating.relevance, rating.completeness];
   const validValues = values.filter(
     (value): value is boolean => value !== null
   );
 
-  if (validValues.length === 0) return { text: "Not rated", percentage: 0 };
+  if (validValues.length === 0)
+    return { text: "Not rated", percentage: 0, isRated: false };
 
   const positiveCount = validValues.filter(Boolean).length;
   const percentage = (positiveCount / validValues.length) * 100;
   return {
     text: `${Math.round(percentage)}% positive`,
     percentage: Math.round(percentage),
+    isRated: true,
   };
 }
 
-function getAverageRatingStyles(percentage: number): string {
-  if (percentage === 0) return "bg-gray-100 text-gray-600"; // Not rated
-  if (percentage > 75) return "bg-green-100 text-green-700";
-  if (percentage < 50) return "bg-red-100 text-red-700";
+function getAverageRatingStyles(result: RatingResult): string {
+  if (!result.isRated) return "bg-gray-100 text-gray-600"; // Not rated
+  if (result.percentage > 75) return "bg-green-100 text-green-700";
+  if (result.percentage < 50) return "bg-red-100 text-red-700";
   return "bg-yellow-100 text-yellow-700"; // Between 50 and 75
 }
 
@@ -124,7 +129,7 @@ export default function ThumbsRating({
   };
 
   const averageRating = calculateAverageRating(rating);
-  const ratingStyles = getAverageRatingStyles(averageRating.percentage);
+  const ratingStyles = getAverageRatingStyles(averageRating);
 
   return (
     <div>
@@ -138,8 +143,13 @@ export default function ThumbsRating({
           {showAverage && (
             <div
               className={`px-3 py-1 rounded-full font-medium ${ratingStyles}`}
+              title={
+                averageRating.isRated
+                  ? `${averageRating.percentage}% of rated categories are positive`
+                  : "No ratings yet"
+              }
             >
-              {averageRating.text}
+              {averageRating.isRated ? averageRating.text : "Not rated"}
             </div>
           )}
         </div>
