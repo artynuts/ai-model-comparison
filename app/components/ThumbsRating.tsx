@@ -1,6 +1,6 @@
 "use client";
 
-import { ResponseRating } from "../types";
+import { ResponseRating, RATING_CATEGORIES } from "../types";
 
 interface ThumbsRatingProps {
   rating?: ResponseRating;
@@ -25,13 +25,7 @@ type RatingResult = {
 function calculateAverageRating(rating?: ResponseRating): RatingResult {
   if (!rating) return { text: "Not rated", percentage: 0, isRated: false };
 
-  const values = [
-    rating.accuracy,
-    rating.relevance,
-    rating.completeness,
-    rating.concise,
-    rating.unbiased,
-  ];
+  const values = RATING_CATEGORIES.map((category) => rating[category.key]);
   const validValues = values.filter(
     (value): value is boolean => value !== null
   );
@@ -119,13 +113,9 @@ function RatingCategory({
 }
 
 export default function ThumbsRating({
-  rating = {
-    accuracy: null,
-    relevance: null,
-    completeness: null,
-    concise: null,
-    unbiased: null,
-  },
+  rating = Object.fromEntries(
+    RATING_CATEGORIES.map((cat) => [cat.key, null])
+  ) as ResponseRating,
   onChange,
   showAverage = true,
   showLabel = true,
@@ -167,36 +157,15 @@ export default function ThumbsRating({
         </div>
       )}
       <div className="space-y-3">
-        <RatingCategory
-          label="Accuracy"
-          description="Were there any factual errors?"
-          value={rating.accuracy}
-          onChange={(value) => handleCategoryChange("accuracy", value)}
-        />
-        <RatingCategory
-          label="Relevance"
-          description="Did it fully answer the question?"
-          value={rating.relevance}
-          onChange={(value) => handleCategoryChange("relevance", value)}
-        />
-        <RatingCategory
-          label="Complete"
-          description="Was anything missing?"
-          value={rating.completeness}
-          onChange={(value) => handleCategoryChange("completeness", value)}
-        />
-        <RatingCategory
-          label="Concise"
-          description="Was the response straight to the point?"
-          value={rating.concise}
-          onChange={(value) => handleCategoryChange("concise", value)}
-        />
-        <RatingCategory
-          label="Unbiased"
-          description="Did you detect any bias in the response?"
-          value={rating.unbiased}
-          onChange={(value) => handleCategoryChange("unbiased", value)}
-        />
+        {RATING_CATEGORIES.map((category) => (
+          <RatingCategory
+            key={category.key}
+            label={category.label}
+            description={category.description}
+            value={rating[category.key]}
+            onChange={(value) => handleCategoryChange(category.key, value)}
+          />
+        ))}
       </div>
     </div>
   );
