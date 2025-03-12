@@ -12,6 +12,7 @@ interface QueryHistory {
 interface HistoryContextType {
   history: QueryHistory[];
   addToHistory: (query: string, responses: AIResponse[]) => void;
+  deleteFromHistory: (timestamp: number) => void;
 }
 
 const HistoryContext = createContext<HistoryContextType | undefined>(undefined);
@@ -36,8 +37,16 @@ export function HistoryProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("queryHistory", JSON.stringify(newHistory));
   };
 
+  const deleteFromHistory = (timestamp: number) => {
+    const newHistory = history.filter((item) => item.timestamp !== timestamp);
+    setHistory(newHistory);
+    localStorage.setItem("queryHistory", JSON.stringify(newHistory));
+  };
+
   return (
-    <HistoryContext.Provider value={{ history, addToHistory }}>
+    <HistoryContext.Provider
+      value={{ history, addToHistory, deleteFromHistory }}
+    >
       {children}
     </HistoryContext.Provider>
   );
