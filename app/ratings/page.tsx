@@ -14,7 +14,7 @@ function getRatingSymbol(value: boolean | null) {
   if (value === true) {
     return (
       <svg
-        className="w-5 h-5 inline-block text-green-600"
+        className="w-4 h-4 inline-block text-green-600"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -31,7 +31,7 @@ function getRatingSymbol(value: boolean | null) {
   if (value === false) {
     return (
       <svg
-        className="w-5 h-5 inline-block text-red-600 rotate-180"
+        className="w-4 h-4 inline-block text-red-600 rotate-180"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
