@@ -44,17 +44,30 @@ export default function RatingsPage() {
         <table className="min-w-full border-collapse">
           <thead>
             <tr>
-              <th className="text-left p-3 bg-gray-50 border-b font-medium text-gray-700">
+              <th
+                rowSpan={2}
+                className="text-left p-3 bg-gray-50 border-b font-medium text-gray-700"
+              >
                 Query
               </th>
+              {modelNames.map((modelName) => (
+                <th
+                  key={modelName}
+                  colSpan={RATING_CATEGORIES.length}
+                  className="p-3 bg-gray-50 border-b font-medium text-gray-700 text-center"
+                >
+                  <div className="whitespace-nowrap">{modelName}</div>
+                </th>
+              ))}
+            </tr>
+            <tr>
               {modelNames.map((modelName) =>
                 RATING_CATEGORIES.map((category) => (
                   <th
                     key={`${modelName}-${category.key}`}
-                    className="p-3 bg-gray-50 border-b font-medium text-gray-700 text-center"
+                    className="p-2 bg-gray-50 border-b font-medium text-gray-700 text-center"
                     title={category.description}
                   >
-                    <div className="whitespace-nowrap">{modelName}</div>
                     <div className="text-xs text-gray-500">
                       {category.label}
                     </div>
