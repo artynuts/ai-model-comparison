@@ -120,15 +120,21 @@ export default function ComparisonForm() {
           {comparison.responses.map((response, index) => (
             <div key={index} className="p-4 border rounded-lg shadow-sm">
               <div className="mb-4">
-                <h3 className="font-bold text-lg">{response.modelName}</h3>
-                <p className="text-sm text-gray-500">{response.provider}</p>
-                <p className="text-xs text-gray-400 font-mono">
-                  {response.version}
-                </p>
-                <p className="text-xs text-gray-400">{response.description}</p>
-                <p className="text-sm text-gray-500 mt-2">
-                  Latency: {response.latency}ms
-                </p>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-bold text-lg">{response.modelName}</h3>
+                    <p className="text-sm text-gray-500">{response.provider}</p>
+                    <p className="text-xs text-gray-400 font-mono">
+                      {response.version}
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      {response.description}
+                    </p>
+                    <p className="text-sm text-gray-500 mt-2">
+                      Latency: {response.latency}ms
+                    </p>
+                  </div>
+                </div>
               </div>
               {response.error ? (
                 <p className="text-red-500">{response.error}</p>

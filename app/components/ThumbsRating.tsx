@@ -5,6 +5,7 @@ import { ResponseRating } from "../types";
 interface ThumbsRatingProps {
   rating?: ResponseRating;
   onChange: (rating: ResponseRating) => void;
+  showAverage?: boolean;
 }
 
 interface RatingCategoryProps {
@@ -12,6 +13,21 @@ interface RatingCategoryProps {
   description: string;
   value: boolean | null;
   onChange: (value: boolean) => void;
+}
+
+function calculateAverageRating(rating?: ResponseRating): string {
+  if (!rating) return "Not rated";
+
+  const values = [rating.accuracy, rating.relevance, rating.completeness];
+  const validValues = values.filter(
+    (value): value is boolean => value !== null
+  );
+
+  if (validValues.length === 0) return "Not rated";
+
+  const positiveCount = validValues.filter(Boolean).length;
+  const percentage = (positiveCount / validValues.length) * 100;
+  return `${Math.round(percentage)}% positive`;
 }
 
 function RatingCategory({
@@ -80,6 +96,7 @@ function RatingCategory({
 export default function ThumbsRating({
   rating = { accuracy: null, relevance: null, completeness: null },
   onChange,
+  showAverage = true,
 }: ThumbsRatingProps) {
   const handleCategoryChange = (
     category: keyof ResponseRating,
@@ -92,25 +109,32 @@ export default function ThumbsRating({
   };
 
   return (
-    <div className="space-y-3">
-      <RatingCategory
-        label="Accuracy"
-        description="Were there any factual errors?"
-        value={rating.accuracy}
-        onChange={(value) => handleCategoryChange("accuracy", value)}
-      />
-      <RatingCategory
-        label="Relevance"
-        description="Did it fully answer the question?"
-        value={rating.relevance}
-        onChange={(value) => handleCategoryChange("relevance", value)}
-      />
-      <RatingCategory
-        label="Complete"
-        description="Was anything missing?"
-        value={rating.completeness}
-        onChange={(value) => handleCategoryChange("completeness", value)}
-      />
+    <div>
+      {showAverage && (
+        <div className="text-sm text-gray-600 font-medium mb-3">
+          {calculateAverageRating(rating)}
+        </div>
+      )}
+      <div className="space-y-3">
+        <RatingCategory
+          label="Accuracy"
+          description="Were there any factual errors?"
+          value={rating.accuracy}
+          onChange={(value) => handleCategoryChange("accuracy", value)}
+        />
+        <RatingCategory
+          label="Relevance"
+          description="Did it fully answer the question?"
+          value={rating.relevance}
+          onChange={(value) => handleCategoryChange("relevance", value)}
+        />
+        <RatingCategory
+          label="Complete"
+          description="Was anything missing?"
+          value={rating.completeness}
+          onChange={(value) => handleCategoryChange("completeness", value)}
+        />
+      </div>
     </div>
   );
 }

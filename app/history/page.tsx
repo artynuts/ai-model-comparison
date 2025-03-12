@@ -6,22 +6,6 @@ import MarkdownResponse from "../components/MarkdownResponse";
 import DeleteButton from "../components/DeleteButton";
 import ThumbsRating from "../components/ThumbsRating";
 import { useHistory } from "../context/HistoryContext";
-import { ResponseRating } from "../types";
-
-function calculateAverageRating(rating?: ResponseRating): string {
-  if (!rating) return "Not rated";
-
-  const values = [rating.accuracy, rating.relevance, rating.completeness];
-  const validValues = values.filter(
-    (value): value is boolean => value !== null
-  );
-
-  if (validValues.length === 0) return "Not rated";
-
-  const positiveCount = validValues.filter(Boolean).length;
-  const percentage = (positiveCount / validValues.length) * 100;
-  return `${Math.round(percentage)}% positive`;
-}
 
 export default function History() {
   const searchParams = useSearchParams();
@@ -80,9 +64,6 @@ export default function History() {
                         <p className="text-xs text-gray-400">
                           Latency: {response.latency}ms
                         </p>
-                      </div>
-                      <div className="text-xs text-gray-600 font-medium">
-                        {calculateAverageRating(response.rating)}
                       </div>
                     </div>
                   </div>
