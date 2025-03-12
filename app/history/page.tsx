@@ -32,7 +32,7 @@ export default function History() {
           <div
             key={historyIndex}
             ref={selectedQuery === item.query ? selectedRef : null}
-            className={`border rounded-lg p-4 ${
+            className={`bg-white border border-gray-200 shadow-[1px_0_5px_0_rgba(0,0,0,0.05)] rounded-lg p-4 ${
               selectedQuery === item.query ? "ring-2 ring-blue-500" : ""
             }`}
           >
@@ -50,7 +50,7 @@ export default function History() {
                 className="text-gray-500"
               />
             </div>
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {item.responses.map((response, responseIndex) => (
                 <QueryResponseCard
                   key={responseIndex}
