@@ -17,8 +17,9 @@ export default function ComparisonForm() {
   const [comparison, setComparison] = useState<ComparisonState>({
     isLoading: false,
     responses: [],
+    timestamp: 0,
   });
-  const { addToHistory } = useHistory();
+  const { addToHistory, updateResponseRating } = useHistory();
 
   const models = ["GPT-4", "Claude", "Gemini"];
 
@@ -73,18 +74,22 @@ export default function ComparisonForm() {
 
     try {
       const responses = await compareModels(query);
-      setComparison({ isLoading: false, responses });
+      const timestamp = Date.now();
+      setComparison({ isLoading: false, responses, timestamp });
       addToHistory(query, responses);
     } catch (error) {
       console.error("Comparison failed:", error);
       setComparison({
         isLoading: false,
         responses: [],
+        timestamp: 0,
       });
     }
   };
 
   const handleRatingChange = (index: number, rating: AIResponse["rating"]) => {
+    if (!comparison.timestamp || !rating) return;
+
     setComparison((prev) => {
       const newResponses = [...prev.responses];
       newResponses[index] = {
@@ -93,6 +98,9 @@ export default function ComparisonForm() {
       };
       return { ...prev, responses: newResponses };
     });
+
+    // Also update the rating in history
+    updateResponseRating(comparison.timestamp, index, rating);
   };
 
   return (

@@ -19,4 +19,5 @@ export interface AIResponse {
 export interface ComparisonState {
   isLoading: boolean;
   responses: AIResponse[];
+  timestamp: number;
 }
