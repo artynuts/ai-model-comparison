@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useHistory } from "../context/HistoryContext";
+import DeleteButton from "./DeleteButton";
 
 interface QueryHistory {
   query: string;
@@ -16,13 +17,6 @@ interface SidebarProps {
 export default function Sidebar() {
   const { history, deleteFromHistory } = useHistory();
   const pathname = usePathname();
-
-  const handleDelete = (e: React.MouseEvent, timestamp: number) => {
-    e.preventDefault(); // Prevent navigation
-    if (window.confirm("Are you sure you want to delete this query?")) {
-      deleteFromHistory(timestamp);
-    }
-  };
 
   return (
     <div className="w-64 h-screen border-r p-4 flex flex-col">
@@ -69,26 +63,13 @@ export default function Sidebar() {
                     {new Date(item.timestamp).toLocaleString()}
                   </p>
                 </Link>
-                <button
-                  onClick={(e) => handleDelete(e, item.timestamp)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:text-red-600"
-                  title="Delete query"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                    />
-                  </svg>
-                </button>
+                <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                  <DeleteButton
+                    onDelete={() => deleteFromHistory(item.timestamp)}
+                    size="sm"
+                    showOnHover
+                  />
+                </div>
               </div>
             ))}
           </div>
