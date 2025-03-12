@@ -65,46 +65,38 @@ function RatingCategory({
           onClick={() => onChange(true)}
           className={`transition-colors ${
             value === true
-              ? "text-green-600"
-              : "text-gray-400 hover:text-gray-600"
+              ? "text-green-100 hover:text-green-600"
+              : "text-gray-300 hover:text-gray-600"
           }`}
           title="Thumbs up"
         >
           <svg
             className="w-5 h-5"
-            fill="none"
             viewBox="0 0 24 24"
-            stroke="currentColor"
+            fill="currentColor"
+            stroke={value === true ? "#86efac" : "none"}
+            strokeWidth={1.5}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"
-            />
+            <path d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
           </svg>
         </button>
         <button
           onClick={() => onChange(false)}
           className={`transition-colors ${
             value === false
-              ? "text-red-600"
-              : "text-gray-400 hover:text-gray-600"
+              ? "text-red-100 hover:text-red-600"
+              : "text-gray-300 hover:text-gray-600"
           }`}
           title="Thumbs down"
         >
           <svg
             className="w-5 h-5 rotate-180"
-            fill="none"
             viewBox="0 0 24 24"
-            stroke="currentColor"
+            fill="currentColor"
+            stroke={value === false ? "#fca5a5" : "none"}
+            strokeWidth={1.5}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"
-            />
+            <path d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
           </svg>
         </button>
       </div>
