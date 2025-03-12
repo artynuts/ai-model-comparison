@@ -66,7 +66,7 @@ export default function Sidebar() {
           </button>
           <div
             className={`space-y-2 overflow-hidden transition-all duration-200 ${
-              isRecentQueriesOpen ? "max-h-[calc(100vh-200px)]" : "max-h-0"
+              isRecentQueriesOpen ? "max-h-[calc(100vh-350px)]" : "max-h-0"
             }`}
           >
             {history.map((item, index) => (
