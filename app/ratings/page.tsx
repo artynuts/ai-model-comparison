@@ -87,7 +87,7 @@ export default function RatingsPage() {
                 <th
                   key={modelName}
                   colSpan={RATING_CATEGORIES.length}
-                  className={`p-3 bg-gray-50 border-b border-gray-200 font-medium text-gray-700 text-center ${
+                  className={`p-3 border-b border-gray-200 font-medium text-gray-700 text-center ${
                     i < modelNames.length - 1 ? "border-r border-gray-200" : ""
                   }`}
                 >
@@ -100,7 +100,7 @@ export default function RatingsPage() {
                 RATING_CATEGORIES.map((category, j) => (
                   <th
                     key={`${modelName}-${category.key}`}
-                    className={`p-2 bg-gray-50 border-b border-gray-200 font-medium text-gray-700 text-center ${
+                    className={`p-2 border-b border-gray-200 font-medium text-gray-700 text-center ${
                       i < modelNames.length - 1 &&
                       j === RATING_CATEGORIES.length - 1
                         ? "border-r border-gray-200"
@@ -173,7 +173,7 @@ export default function RatingsPage() {
                 <th
                   key={category.key}
                   colSpan={modelNames.length}
-                  className="p-3 bg-gray-50 border-b border-gray-200 font-medium text-gray-700 text-center border-r border-gray-200"
+                  className="p-3 border-b border-gray-200 font-medium text-gray-700 text-center border-r border-gray-200"
                   title={category.description}
                 >
                   <div className="whitespace-nowrap">{category.label}</div>
@@ -185,7 +185,7 @@ export default function RatingsPage() {
                 modelNames.map((modelName, i) => (
                   <th
                     key={`${category.key}-${modelName}`}
-                    className={`p-2 bg-gray-50 border-b border-gray-200 font-medium text-gray-700 text-center ${
+                    className={`p-2 border-b border-gray-200 font-medium text-gray-700 text-center ${
                       i === modelNames.length - 1
                         ? "border-r border-gray-200"
                         : ""
