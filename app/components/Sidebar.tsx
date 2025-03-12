@@ -49,7 +49,7 @@ export default function Sidebar() {
             Recent Queries
           </h2>
           <div className="space-y-2">
-            {history.slice(0, 5).map((item, index) => (
+            {history.map((item, index) => (
               <div
                 key={index}
                 className="group relative block p-2 text-sm hover:bg-gray-50 rounded"
