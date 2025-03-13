@@ -10,6 +10,34 @@ This tool helps you evaluate and compare the performance of different AI models 
 - Tracking your rating history and model performance
 - Analyzing which models perform better in specific categories
 
+## Interface Showcase
+
+### Main Comparison View
+
+![Main Comparison View](images/aimc-compare.png)
+The main interface where you can enter queries and view responses from different AI models side by side.
+
+![Main Comparison View](images/aimc-response.png)
+Compare responses from different models in a clean, organized layout.
+
+### Rating System
+
+![Rating System](images/aimc-ratings.png)
+Interactive rating controls for evaluating responses across different categories.
+
+### Query History
+
+![Query History](images/aimc-history.png)
+Access and manage your past queries and their responses.
+
+### Ratings Summary
+
+![Ratings Summary](images/aimc-ratings-by-model.png)
+Comprehensive view of all ratings, organized by model.
+
+![Ratings Summary](images/aimc-ratings-by-category.png)
+Comprehensive view of all ratings, organized by category.
+
 ## Features
 
 - Compare responses from multiple AI models in real-time
