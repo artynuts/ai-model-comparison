@@ -2,6 +2,14 @@
 
 A web application that allows you to compare responses from multiple AI models side by side. Send a single query and get responses from GPT-4, Claude, and Gemini simultaneously.
 
+This tool helps you evaluate and compare the performance of different AI models by:
+
+- Sending the same prompt to multiple models simultaneously
+- Viewing responses side-by-side for easy comparison
+- Rating responses across different categories (accuracy, clarity, etc.)
+- Tracking your rating history and model performance
+- Analyzing which models perform better in specific categories
+
 ## Features
 
 - Compare responses from multiple AI models in real-time

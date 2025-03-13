@@ -24,6 +24,11 @@ export default function RootLayout({
                 <h1 className="text-2xl font-bold text-gray-900">
                   AI Model Comparison
                 </h1>
+                <p className="text-sm text-gray-600 mt-1">
+                  Compare responses from different LLM models side by side. Rate
+                  responses across different categories and track model
+                  performance.
+                </p>
               </div>
             </header>
             <div className="flex flex-1 overflow-hidden">
