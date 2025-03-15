@@ -1,0 +1,21 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model QueryHistory {
+  id        String   @id @default(cuid())
+  query     String
+  timestamp BigInt
+  responses Json     // Store responses as JSON
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([timestamp])
+} 
