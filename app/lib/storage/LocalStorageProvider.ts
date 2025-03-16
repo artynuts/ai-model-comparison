@@ -10,7 +10,17 @@ export class LocalStorageProvider implements StorageProvider {
       return [];
     }
     const stored = localStorage.getItem(HISTORY_KEY);
-    return stored ? JSON.parse(stored) : [];
+    const history = stored ? JSON.parse(stored) : [];
+
+    // Ensure all history items and responses have valid IDs
+    return history.map((item: HistoryItem) => ({
+      ...item,
+      id: !item.id || item.id.trim() === "" ? uuidv4() : item.id,
+      responses: item.responses.map((response) => ({
+        ...response,
+        id: !response.id || response.id.trim() === "" ? uuidv4() : response.id,
+      })),
+    }));
   }
 
   private setStoredHistory(history: HistoryItem[]): void {
