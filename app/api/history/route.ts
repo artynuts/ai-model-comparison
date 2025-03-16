@@ -1,14 +1,21 @@
-import { prisma } from "@/lib/db";
+import { executeQuery } from "@/lib/db";
 import { NextResponse } from "next/server";
+
+interface QueryHistory {
+  id: string;
+  query: string;
+  timestamp: number;
+  responses: any;
+  created_at: Date;
+  updated_at: Date;
+}
 
 // GET all history items
 export async function GET() {
   try {
-    const history = await prisma.queryHistory.findMany({
-      orderBy: {
-        timestamp: "desc",
-      },
-    });
+    const history = await executeQuery<QueryHistory>(
+      'SELECT * FROM "QueryHistory" ORDER BY timestamp DESC'
+    );
     return NextResponse.json(history);
   } catch (error) {
     console.error("Failed to fetch history:", error);
@@ -25,13 +32,10 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { query, timestamp, responses } = body;
 
-    const history = await prisma.queryHistory.create({
-      data: {
-        query,
-        timestamp,
-        responses,
-      },
-    });
+    const [history] = await executeQuery<QueryHistory>(
+      'INSERT INTO "QueryHistory" (query, timestamp, responses, created_at, updated_at) VALUES ($1, $2, $3, NOW(), NOW()) RETURNING *',
+      [query, timestamp, responses]
+    );
 
     return NextResponse.json(history);
   } catch (error) {
@@ -56,11 +60,9 @@ export async function DELETE(request: Request) {
       );
     }
 
-    await prisma.queryHistory.deleteMany({
-      where: {
-        timestamp: BigInt(timestamp),
-      },
-    });
+    await executeQuery('DELETE FROM "QueryHistory" WHERE timestamp = $1', [
+      timestamp,
+    ]);
 
     return NextResponse.json({ message: "History item deleted" });
   } catch (error) {

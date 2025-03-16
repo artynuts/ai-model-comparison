@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS "QueryHistory" (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  query TEXT NOT NULL,
+  timestamp BIGINT NOT NULL,
+  responses JSONB NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_query_history_timestamp ON "QueryHistory" (timestamp DESC); 
