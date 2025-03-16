@@ -42,7 +42,7 @@ export class LocalStorageProvider implements StorageProvider {
       timestamp: Date.now(),
       responses,
     };
-    history.push(newItem);
+    history.unshift(newItem);
     this.setStoredHistory(history);
   }
 
