@@ -6,7 +6,7 @@ export default function StorageSelector() {
   const { storageType, setStorageType } = useStorage();
 
   return (
-    <div className="mb-4">
+    <div className="mt-4 mb-4 px-2">
       <label className="block text-sm text-gray-600 mb-1.5">Storage:</label>
       <select
         value={storageType}
