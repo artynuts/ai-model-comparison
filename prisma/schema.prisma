@@ -1,5 +1,3 @@
-// This is your Prisma schema file
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,9 +11,9 @@ model QueryHistory {
   id        String   @id @default(cuid())
   query     String
   timestamp BigInt
-  responses Json     // Store responses as JSON
+  responses Json
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([timestamp])
-} 
+}
