@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useHistory } from "../context/HistoryContext";
+import { useStorage } from "../context/StorageContext";
+import StorageSelector from "./StorageSelector";
 import DeleteButton from "./DeleteButton";
 
 interface QueryHistory {
@@ -15,42 +16,43 @@ interface SidebarProps {
   history: QueryHistory[];
 }
 
+const LINKS = [
+  { href: "/", label: "Compare" },
+  { href: "/history", label: "History" },
+  { href: "/ratings", label: "Ratings" },
+];
+
 export default function Sidebar() {
-  const { history, deleteFromHistory } = useHistory();
   const pathname = usePathname();
+  const { history, deleteFromHistory } = useStorage();
   const [isRecentQueriesOpen, setIsRecentQueriesOpen] = useState(true);
+
+  const recentQueries = history.slice(0, 5).map((item) => ({
+    query: item.query,
+    timestamp: item.timestamp,
+  }));
 
   return (
     <div className="sticky top-0 h-screen overflow-y-auto border-r border-gray-200 shadow-[1px_0_5px_0_rgba(0,0,0,0.05)] p-4 flex flex-col">
       <nav className="flex-1 overflow-y-auto">
-        <Link
-          href="/"
-          className={`block mb-2 p-2 rounded transition-colors outline-none focus-visible:border focus-visible:border-blue-200 ${
-            pathname === "/" ? "bg-blue-50 text-blue-600" : "hover:bg-gray-50"
-          }`}
-        >
-          Compare Models
-        </Link>
-        <Link
-          href="/history"
-          className={`block mb-2 p-2 rounded transition-colors outline-none focus-visible:border focus-visible:border-blue-200 ${
-            pathname === "/history"
-              ? "bg-blue-50 text-blue-600"
-              : "hover:bg-gray-50"
-          }`}
-        >
-          Full History
-        </Link>
-        <Link
-          href="/ratings"
-          className={`block mb-2 p-2 rounded transition-colors outline-none focus-visible:border focus-visible:border-blue-200 ${
-            pathname === "/ratings"
-              ? "bg-blue-50 text-blue-600"
-              : "hover:bg-gray-50"
-          }`}
-        >
-          Ratings Summary
-        </Link>
+        <ul className="space-y-2">
+          {LINKS.map(({ href, label }) => (
+            <li key={href}>
+              <Link
+                href={href}
+                className={`block px-4 py-2 rounded-lg transition-colors ${
+                  pathname === href
+                    ? "bg-blue-50 text-blue-700"
+                    : "text-gray-600 hover:bg-gray-50"
+                }`}
+              >
+                {label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+
+        <StorageSelector />
 
         <div className="mt-6">
           <button
@@ -79,20 +81,23 @@ export default function Sidebar() {
               isRecentQueriesOpen ? "max-h-[calc(100vh-350px)]" : "max-h-0"
             }`}
           >
-            {history.map((item, index) => (
-              <div key={index} className="group relative block text-sm rounded">
+            {recentQueries.map(({ query, timestamp }) => (
+              <div
+                key={timestamp}
+                className="group relative block text-sm rounded"
+              >
                 <Link
-                  href={`/history?query=${encodeURIComponent(item.query)}`}
+                  href={`/history?query=${encodeURIComponent(query)}`}
                   className="block p-2 rounded transition-colors outline-none focus-visible:border focus-visible:border-blue-200 hover:bg-gray-200"
                 >
-                  <p className="truncate pr-6">{item.query}</p>
+                  <p className="truncate pr-6">{query}</p>
                   <p className="text-xs text-gray-500">
-                    {new Date(item.timestamp).toLocaleString()}
+                    {new Date(timestamp).toLocaleString()}
                   </p>
                 </Link>
                 <div className="absolute right-2 top-1/2 -translate-y-1/2">
                   <DeleteButton
-                    onDelete={() => deleteFromHistory(item.timestamp)}
+                    onDelete={() => deleteFromHistory(timestamp)}
                     size="sm"
                     showOnHover
                   />

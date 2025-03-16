@@ -1,14 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { AIResponse, ComparisonState } from "../types";
+import { compareModels } from "../lib/api";
+import { AIResponse } from "../types";
 import QueryGroup from "./QueryGroup";
-import { useHistory } from "../context/HistoryContext";
+import { useStorage } from "../context/StorageContext";
 
-interface QueryHistory {
-  query: string;
-  timestamp: number;
+interface ComparisonState {
+  isLoading: boolean;
   responses: AIResponse[];
+  timestamp: number;
 }
 
 export default function ComparisonForm() {
@@ -18,52 +19,7 @@ export default function ComparisonForm() {
     responses: [],
     timestamp: 0,
   });
-  const { addToHistory, updateResponseRating } = useHistory();
-
-  const models = ["GPT-4", "Claude", "Gemini"];
-
-  const compareModels = async (query: string): Promise<AIResponse[]> => {
-    return Promise.all(
-      models.map(async (model) => {
-        const startTime = Date.now();
-        try {
-          const response = await fetch("/api/ask", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ model, query }),
-          });
-
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || `${model} request failed`);
-          }
-
-          const data = await response.json();
-          return {
-            modelName: data.name,
-            id: data.id,
-            provider: data.provider,
-            version: data.version,
-            description: data.description,
-            response: data.response,
-            latency: Date.now() - startTime,
-          };
-        } catch (error) {
-          return {
-            modelName: model,
-            id: model,
-            provider: "Unknown",
-            version: "Unknown",
-            description: "Error occurred",
-            response: "",
-            latency: Date.now() - startTime,
-            error:
-              error instanceof Error ? error.message : "Unknown error occurred",
-          };
-        }
-      })
-    );
-  };
+  const { addToHistory, updateResponseRating } = useStorage();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
