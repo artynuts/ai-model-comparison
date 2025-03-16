@@ -4,7 +4,6 @@ import { useStorage } from "../context/StorageContext";
 import { RATING_CATEGORIES } from "../types";
 import Link from "next/link";
 import ThumbsIcon from "../components/ThumbsIcon";
-import StorageSelector from "../components/StorageSelector";
 
 function getRatingColor(value: boolean | null) {
   if (value === true) return "bg-green-100 text-green-700";
@@ -38,15 +37,12 @@ export default function RatingsPage() {
     <div className="p-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Ratings Summary</h1>
-        <div className="flex items-center gap-4">
-          <StorageSelector />
-          <Link
-            href="/"
-            className="text-blue-600 hover:text-blue-800 transition-colors"
-          >
-            Back to Compare
-          </Link>
-        </div>
+        <Link
+          href="/"
+          className="text-blue-600 hover:text-blue-800 transition-colors"
+        >
+          Back to Compare
+        </Link>
       </div>
 
       <div className="overflow-x-auto px-4">
