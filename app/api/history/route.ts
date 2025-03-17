@@ -38,11 +38,11 @@ export async function POST(request: Request) {
     const jsonResponses = JSON.stringify(responses);
 
     const [history] = await executeQuery<QueryHistory>(
-      'INSERT INTO "QueryHistory" (id, query, timestamp, responses) VALUES ($1, $2, $3, $4::jsonb) RETURNING *',
+      'INSERT INTO "QueryHistory" (id, query, timestamp, responses) VALUES ($1, $2, $3, $4::jsonb) ON CONFLICT (id) DO NOTHING RETURNING *',
       [id, query, timestamp, jsonResponses]
     );
 
-    return NextResponse.json(history);
+    return NextResponse.json(history || { skipped: true });
   } catch (error) {
     console.error("Failed to create history item:", error);
     return NextResponse.json(
