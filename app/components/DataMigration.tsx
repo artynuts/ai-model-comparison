@@ -12,9 +12,9 @@ export default function DataMigration() {
   const { storageType } = useStorage();
   const [skippedQueries, setSkippedQueries] = useState<string[]>([]);
 
-  const handleMigration = async () => {
+  const migrateToPostgres = async () => {
     setIsLoading(true);
-    setStatus("Starting migration...");
+    setStatus("Starting migration to PostgreSQL...");
     setSkippedQueries([]);
 
     try {
@@ -74,7 +74,80 @@ export default function DataMigration() {
     }
   };
 
-  const isMigrationDisabled = storageType !== "postgres" || isLoading;
+  const migrateToLocalStorage = async () => {
+    setIsLoading(true);
+    setStatus("Starting migration to localStorage...");
+    setSkippedQueries([]);
+
+    try {
+      // Get data from PostgreSQL
+      const pgProvider = new PostgresStorageProvider();
+      const pgData = await pgProvider.getHistory();
+
+      if (pgData.length === 0) {
+        setStatus("No data found in PostgreSQL to migrate.");
+        setIsLoading(false);
+        return;
+      }
+
+      setStatus(`Found ${pgData.length} items in PostgreSQL. Migrating...`);
+
+      // Migrate to localStorage
+      const localProvider = new LocalStorageProvider();
+      let migrated = 0;
+      let skipped = 0;
+      const skippedList: string[] = [];
+
+      // Migrate each item
+      for (let i = 0; i < pgData.length; i++) {
+        const item = pgData[i];
+        const result = await localProvider.addHistory(
+          item.query,
+          item.responses,
+          item.id,
+          item.timestamp
+        );
+
+        if (result.skipped) {
+          skipped++;
+          skippedList.push(item.query);
+        } else {
+          migrated++;
+        }
+
+        setStatus(
+          `Progress: ${i + 1}/${
+            pgData.length
+          } (${migrated} new, ${skipped} existing)`
+        );
+      }
+
+      setSkippedQueries(skippedList);
+      setStatus(
+        `Migration complete: ${migrated} items migrated, ${skipped} items skipped.`
+      );
+    } catch (error) {
+      console.error("Migration failed:", error);
+      setStatus("Migration failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleMigration = () => {
+    if (storageType === "postgres") {
+      migrateToLocalStorage();
+    } else {
+      migrateToPostgres();
+    }
+  };
+
+  const getMigrationButtonText = () => {
+    if (isLoading) return "Migrating...";
+    return storageType === "postgres"
+      ? "Migrate to localStorage"
+      : "Migrate to PostgreSQL";
+  };
 
   return (
     <div className="space-y-4">
@@ -82,15 +155,15 @@ export default function DataMigration() {
         <div>
           <h3 className="text-lg font-medium">Data Migration</h3>
           <p className="text-sm text-gray-500">
-            Transfer your data from localStorage to PostgreSQL database
+            Transfer your data between localStorage and PostgreSQL database
           </p>
         </div>
         <button
           onClick={handleMigration}
-          disabled={isMigrationDisabled}
+          disabled={isLoading}
           className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-blue-300 transition-colors"
         >
-          {isLoading ? "Migrating..." : "Migrate to PostgreSQL"}
+          {getMigrationButtonText()}
         </button>
       </div>
       {status && (
@@ -109,11 +182,6 @@ export default function DataMigration() {
             </CollapsibleSection>
           )}
         </div>
-      )}
-      {storageType !== "postgres" && (
-        <p className="text-sm text-amber-600">
-          Please switch to PostgreSQL storage type before migrating data.
-        </p>
       )}
     </div>
   );
