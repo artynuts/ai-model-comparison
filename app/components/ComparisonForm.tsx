@@ -65,7 +65,7 @@ export default function ComparisonForm() {
           <textarea
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full p-4 bg-white border border-gray-200 shadow-[1px_0_5px_0_rgba(0,0,0,0.05)] rounded-lg h-32 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-4 bg-white border border-gray-200 shadow-[1px_0_5px_0_rgba(0,0,0,0.05)] rounded-lg h-32"
             placeholder="Enter your query here..."
           />
         </div>
