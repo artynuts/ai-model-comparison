@@ -16,7 +16,7 @@ export class PostgresStorageProvider implements StorageProvider {
     responses: AIResponse[],
     id?: string,
     timestamp?: number
-  ): Promise<string> {
+  ): Promise<{ id: string; skipped: boolean }> {
     const newId = id || uuidv4();
     const response = await fetch("/api/history", {
       method: "POST",
@@ -35,7 +35,8 @@ export class PostgresStorageProvider implements StorageProvider {
       throw new Error("Failed to add history to PostgreSQL");
     }
 
-    return newId;
+    const result = await response.json();
+    return { id: newId, skipped: result.skipped || false };
   }
 
   async deleteHistory(id: string): Promise<void> {

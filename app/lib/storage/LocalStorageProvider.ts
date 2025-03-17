@@ -39,9 +39,16 @@ export class LocalStorageProvider implements StorageProvider {
     responses: AIResponse[],
     id?: string,
     timestamp?: number
-  ): Promise<string> {
+  ): Promise<{ id: string; skipped: boolean }> {
     const history = this.getStoredHistory();
     const newId = id || uuidv4();
+
+    // Check if item already exists
+    const exists = history.some((item) => item.id === newId);
+    if (exists) {
+      return { id: newId, skipped: true };
+    }
+
     const newItem: HistoryItem = {
       id: newId,
       query,
@@ -50,7 +57,7 @@ export class LocalStorageProvider implements StorageProvider {
     };
     history.unshift(newItem);
     this.setStoredHistory(history);
-    return newId;
+    return { id: newId, skipped: false };
   }
 
   async deleteHistory(id: string): Promise<void> {

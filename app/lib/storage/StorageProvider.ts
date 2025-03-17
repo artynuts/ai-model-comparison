@@ -14,7 +14,7 @@ export interface StorageProvider {
     responses: AIResponse[],
     id?: string,
     timestamp?: number
-  ): Promise<string>;
+  ): Promise<{ id: string; skipped: boolean }>;
   deleteHistory(id: string): Promise<void>;
   updateResponseRating(
     id: string,

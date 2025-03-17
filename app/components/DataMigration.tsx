@@ -31,21 +31,43 @@ export default function DataMigration() {
 
       // Migrate to PostgreSQL
       const pgProvider = new PostgresStorageProvider();
+      let migrated = 0;
+      let skipped = 0;
+      const skippedQueries: string[] = [];
 
       // Migrate each item
       for (let i = 0; i < localData.length; i++) {
         const item = localData[i];
-        await pgProvider.addHistory(
+        const result = await pgProvider.addHistory(
           item.query,
           item.responses,
           item.id,
           item.timestamp
         );
-        setStatus(`Migrated ${i + 1} of ${localData.length} items...`);
+
+        if (result.skipped) {
+          skipped++;
+          skippedQueries.push(item.query);
+        } else {
+          migrated++;
+        }
+
+        setStatus(
+          `Progress: ${i + 1}/${
+            localData.length
+          } (${migrated} new, ${skipped} existing)`
+        );
       }
 
+      const skippedDetails =
+        skippedQueries.length > 0
+          ? `\n\nSkipped queries:\n${skippedQueries
+              .map((q) => `- "${q}"`)
+              .join("\n")}`
+          : "";
+
       setStatus(
-        `Successfully migrated ${localData.length} items to PostgreSQL.`
+        `Migration complete: ${migrated} items migrated, ${skipped} items skipped.${skippedDetails}`
       );
     } catch (error) {
       console.error("Migration failed:", error);
@@ -75,7 +97,7 @@ export default function DataMigration() {
         </button>
       </div>
       {status && (
-        <div className="text-sm p-4 bg-gray-50 rounded-lg">
+        <div className="text-sm p-4 bg-gray-50 rounded-lg whitespace-pre-wrap">
           <p>{status}</p>
         </div>
       )}
