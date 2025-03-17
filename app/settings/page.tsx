@@ -5,6 +5,7 @@ import Link from "next/link";
 import StorageSelector from "../components/StorageSelector";
 import DataMigration from "../components/DataMigration";
 import DataValidation from "../components/DataValidation";
+import DataDeletion from "../components/DataDeletion";
 
 export default function SettingsPage() {
   return (
@@ -72,8 +73,11 @@ export default function SettingsPage() {
             <div className="border-b border-gray-200 pb-6">
               <DataMigration />
             </div>
-            <div>
+            <div className="border-b border-gray-200 pb-6">
               <DataValidation />
+            </div>
+            <div>
+              <DataDeletion />
             </div>
           </div>
         </section>
