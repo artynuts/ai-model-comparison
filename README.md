@@ -10,6 +10,8 @@ This tool helps you evaluate and compare the performance of different AI models 
 - Tracking your rating history and model performance
 - Analyzing which models perform better in specific categories
 - Flexible storage options with PostgreSQL or localStorage
+- Data validation and cleanup tools
+- Bulk data deletion capabilities
 
 ## Interface Showcase
 
@@ -49,6 +51,10 @@ Comprehensive view of all ratings, organized by category.
   - PostgreSQL database for persistent storage
   - Browser localStorage for offline usage
   - Easy switching between storage types
+- Data management tools:
+  - Data validation and automatic fixing
+  - Bulk data deletion
+  - Storage-specific operations
 - Responsive design for desktop and mobile
 - Dark/light mode support
 - Enhanced UI with:
@@ -93,6 +99,8 @@ Comprehensive view of all ratings, organized by category.
 
 ## Setup
 
+### Local Development Setup
+
 1. Clone the repository:
 
 ```bash
@@ -122,6 +130,23 @@ npm run dev
 ```
 
 5. Open [http://localhost:3000](http://localhost:3000) in your browser
+
+### Data Management
+
+The application includes tools for managing your data:
+
+1. **Data Validation**
+
+   - Located in the Settings page
+   - Checks for missing IDs, incorrect ordering, and other issues
+   - Automatically fixes common problems
+   - Works with both PostgreSQL and localStorage
+
+2. **Data Deletion**
+   - Located in the Settings page
+   - Allows bulk deletion of all data
+   - Storage-specific deletion (PostgreSQL or localStorage)
+   - Confirmation dialog to prevent accidental deletion
 
 ## Usage
 
@@ -156,20 +181,27 @@ ai-model-comparison/
 │   │   ├── ThumbsIcon.tsx     # Shared rating icon component
 │   │   ├── ThumbsRating.tsx   # Rating control component
 │   │   ├── StorageSelector.tsx # Storage type selector
+│   │   ├── DataValidation.tsx # Data validation component
+│   │   ├── DataDeletion.tsx   # Data deletion component
 │   │   └── ...
 │   ├── context/      # React context
 │   │   ├── StorageContext.tsx # Storage management
 │   │   └── ...
 │   ├── lib/
-│   │   └── storage/  # Storage providers
-│   │       ├── PostgresStorageProvider.ts
-│   │       ├── LocalStorageProvider.ts
-│   │       └── StorageProvider.ts
+│   │   ├── storage/  # Storage providers
+│   │   │   ├── PostgresStorageProvider.ts
+│   │   │   ├── LocalStorageProvider.ts
+│   │   │   └── StorageProvider.ts
+│   │   └── utils/    # Utility functions
+│   │       └── storage.ts
 │   ├── history/      # History page
 │   ├── ratings/      # Ratings summary page
+│   ├── settings/     # Settings page
 │   ├── types/        # TypeScript types
 │   └── page.tsx      # Main page
+├── docker/           # Docker configuration files
 ├── public/           # Static assets
+├── docker-compose.yml # Docker Compose configuration
 └── package.json      # Dependencies and scripts
 ```
 
