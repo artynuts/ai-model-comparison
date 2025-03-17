@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { LocalStorageProvider } from "../lib/storage/LocalStorageProvider";
+import { PostgresStorageProvider } from "../lib/storage/PostgresStorageProvider";
 import { useStorage } from "../context/StorageContext";
 import { HistoryItem } from "../lib/storage/StorageProvider";
 import { v4 as uuidv4 } from "uuid";
-import CollapsibleSection from "../components/CollapsibleSection";
+import CollapsibleSection from "./CollapsibleSection";
 
 interface ValidationResult {
   totalItems: number;
@@ -13,6 +14,7 @@ interface ValidationResult {
   responsesWithMissingIds: number;
   itemsFixed: number;
   orderFixed: boolean;
+  queriesTrimmed: number;
 }
 
 export default function DataValidation() {
@@ -27,11 +29,14 @@ export default function DataValidation() {
     setResult(null);
 
     try {
-      const localProvider = new LocalStorageProvider();
-      const data = await localProvider.getHistory();
+      const provider =
+        storageType === "postgres"
+          ? new PostgresStorageProvider()
+          : new LocalStorageProvider();
+      const data = await provider.getHistory();
 
       if (data.length === 0) {
-        setStatus("No data found in localStorage to validate.");
+        setStatus(`No data found in ${storageType} to validate.`);
         return;
       }
 
@@ -39,6 +44,7 @@ export default function DataValidation() {
       let responsesWithMissingIds = 0;
       let itemsFixed = 0;
       let orderFixed = false;
+      let queriesTrimmed = 0;
 
       // Validate and fix data
       let fixedData = data.map((item: HistoryItem) => {
@@ -54,6 +60,7 @@ export default function DataValidation() {
         // Trim query
         const trimmedQuery = item.query.trim();
         if (trimmedQuery !== item.query) {
+          queriesTrimmed++;
           itemWasFixed = true;
         }
 
@@ -90,9 +97,29 @@ export default function DataValidation() {
         itemsFixed++;
       }
 
-      // Save fixed data back to localStorage if any changes were made
+      // Save fixed data back to storage if any changes were made
       if (itemsFixed > 0 || orderFixed) {
-        localStorage.setItem("queryHistory", JSON.stringify(fixedData));
+        if (storageType === "localStorage") {
+          localStorage.setItem("queryHistory", JSON.stringify(fixedData));
+        } else {
+          // For PostgreSQL, update each modified item
+          for (const item of fixedData) {
+            const original = data.find((d) => d.id === item.id);
+            if (
+              original &&
+              (original.query !== item.query ||
+                JSON.stringify(original.responses) !==
+                  JSON.stringify(item.responses))
+            ) {
+              await provider.addHistory(
+                item.query,
+                item.responses,
+                item.id,
+                item.timestamp
+              );
+            }
+          }
+        }
       }
 
       setResult({
@@ -101,11 +128,15 @@ export default function DataValidation() {
         responsesWithMissingIds,
         itemsFixed,
         orderFixed,
+        queriesTrimmed,
       });
 
       const statusMessages = [];
       if (itemsFixed > 0) {
-        statusMessages.push(`Fixed ${itemsFixed} items with ID issues`);
+        statusMessages.push(`Fixed ${itemsFixed} items with issues`);
+      }
+      if (queriesTrimmed > 0) {
+        statusMessages.push(`Trimmed ${queriesTrimmed} queries`);
       }
       if (orderFixed) {
         statusMessages.push("Fixed timestamp ordering");
@@ -114,7 +145,7 @@ export default function DataValidation() {
       setStatus(
         statusMessages.length > 0
           ? `${statusMessages.join(". ")}.`
-          : "No issues found in localStorage data."
+          : `No issues found in ${storageType} data.`
       );
     } catch (error) {
       console.error("Validation failed:", error);
@@ -124,20 +155,19 @@ export default function DataValidation() {
     }
   };
 
-  const isValidationDisabled = storageType !== "localStorage" || isLoading;
-
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-medium">Data Validation</h3>
           <p className="text-sm text-gray-500">
-            Check and fix data integrity issues in localStorage
+            Check and fix data integrity issues in{" "}
+            {storageType === "postgres" ? "PostgreSQL" : "localStorage"}
           </p>
         </div>
         <button
           onClick={validateAndFixData}
-          disabled={isValidationDisabled}
+          disabled={isLoading}
           className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-blue-300 transition-colors"
         >
           {isLoading ? "Validating..." : "Validate & Fix Data"}
@@ -155,6 +185,7 @@ export default function DataValidation() {
                 <li>
                   Responses with missing IDs: {result.responsesWithMissingIds}
                 </li>
+                <li>Queries trimmed: {result.queriesTrimmed}</li>
                 <li>
                   Items with fixed IDs:{" "}
                   {result.itemsFixed - (result.orderFixed ? 1 : 0)}
@@ -168,12 +199,6 @@ export default function DataValidation() {
             </CollapsibleSection>
           )}
         </div>
-      )}
-
-      {storageType !== "localStorage" && (
-        <p className="text-sm text-amber-600">
-          Please switch to localStorage storage type to validate local data.
-        </p>
       )}
     </div>
   );
