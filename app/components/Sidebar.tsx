@@ -35,14 +35,14 @@ export default function Sidebar() {
   return (
     <div className="sticky top-0 h-screen overflow-y-auto border-r border-gray-200 shadow-[1px_0_5px_0_rgba(0,0,0,0.05)] p-4 flex flex-col">
       <nav className="flex-1 overflow-y-auto">
-        <ul className="space-y-2">
+        <ul className="space-y-2 p-1">
           {LINKS.map(({ href, label }) => (
             <li key={href}>
               <Link
                 href={href}
-                className={`block px-4 py-2 rounded-lg transition-colors ${
+                className={`block px-4 py-2 border border-gray-200 shadow-[1px_0_5px_0_rgba(0,0,0,0.05)] rounded-lg transition-colors ${
                   pathname === href
-                    ? "bg-blue-50 text-blue-700"
+                    ? "bg-blue-50 text-blue-700 border-blue-200"
                     : "text-gray-600 hover:bg-gray-50"
                 }`}
               >
@@ -54,10 +54,10 @@ export default function Sidebar() {
 
         <StorageSelector />
 
-        <div className="mt-6">
+        <div className="mt-6 p-1">
           <button
             onClick={() => setIsRecentQueriesOpen(!isRecentQueriesOpen)}
-            className="flex items-center justify-between w-full text-sm font-semibold text-gray-500 mb-2 p-2 rounded transition-colors outline-none focus-visible:border focus-visible:border-blue-200 hover:text-gray-700 hover:bg-gray-200"
+            className="flex items-center justify-between w-full text-sm font-semibold text-gray-500 mb-2 px-4 py-2 border border-gray-200 shadow-[1px_0_5px_0_rgba(0,0,0,0.05)] rounded-lg transition-colors hover:bg-gray-50"
           >
             <span>Recent Queries</span>
             <svg
@@ -84,11 +84,11 @@ export default function Sidebar() {
             {recentQueries.map(({ query, timestamp }) => (
               <div
                 key={timestamp}
-                className="group relative block text-sm rounded"
+                className="group relative block text-sm rounded p-1"
               >
                 <Link
                   href={`/history?query=${encodeURIComponent(query)}`}
-                  className="block p-2 rounded transition-colors outline-none focus-visible:border focus-visible:border-blue-200 hover:bg-gray-200"
+                  className="block p-2 border border-gray-200 shadow-[1px_0_5px_0_rgba(0,0,0,0.05)] rounded-lg transition-colors hover:bg-gray-50"
                 >
                   <p className="truncate pr-6">{query}</p>
                   <p className="text-xs text-gray-500">
