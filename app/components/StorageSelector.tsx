@@ -2,12 +2,22 @@
 
 import { useStorage } from "../context/StorageContext";
 
-export default function StorageSelector() {
+interface StorageSelectorProps {
+  variant?: "sidebar" | "settings";
+}
+
+export default function StorageSelector({
+  variant = "sidebar",
+}: StorageSelectorProps) {
   const { storageType, setStorageType } = useStorage();
 
+  const containerClasses = variant === "sidebar" ? "mt-4 mb-4 px-2" : "";
+
   return (
-    <div className="mt-4 mb-4 p-1">
-      <label className="block text-sm text-gray-600 mb-1.5">Storage:</label>
+    <div className={containerClasses}>
+      <label className="block text-sm font-medium text-gray-700 mb-2">
+        Storage Type:
+      </label>
       <select
         value={storageType}
         onChange={(e) =>

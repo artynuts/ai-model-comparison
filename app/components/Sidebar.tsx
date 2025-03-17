@@ -20,6 +20,7 @@ const LINKS = [
   { href: "/", label: "Compare" },
   { href: "/history", label: "History" },
   { href: "/ratings", label: "Ratings" },
+  { href: "/settings", label: "Settings" },
 ];
 
 export default function Sidebar() {
@@ -52,7 +53,7 @@ export default function Sidebar() {
           ))}
         </ul>
 
-        <StorageSelector />
+        <StorageSelector variant="sidebar" />
 
         <div className="mt-6 p-1">
           <button
