@@ -41,6 +41,14 @@ Comprehensive view of all ratings, organized by model.
 ![Ratings Summary](images/aimc-ratings-by-category.png)
 Comprehensive view of all ratings, organized by category.
 
+### Settings
+
+![Settings](images/aimc-settings.png)
+Add the ability to support different storage providers: Local Storage & PostgreSQL.
+
+![Data Validation and Migration](images/aimc-settings-2.png)
+Add the ability to migrate data from one storage to another, validate the data in a storage, delete all the data in a storage layer.
+
 ## Features
 
 - Compare responses from multiple AI models in real-time
