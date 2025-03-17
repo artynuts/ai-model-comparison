@@ -10,6 +10,7 @@ interface ComparisonState {
   isLoading: boolean;
   responses: AIResponse[];
   timestamp: number;
+  id?: string;
 }
 
 export default function ComparisonForm() {
@@ -30,8 +31,8 @@ export default function ComparisonForm() {
     try {
       const responses = await compareModels(query);
       const timestamp = Date.now();
-      setComparison({ isLoading: false, responses, timestamp });
-      addToHistory(query, responses);
+      const id = await addToHistory(query, responses);
+      setComparison({ isLoading: false, responses, timestamp, id });
     } catch (error) {
       console.error("Comparison failed:", error);
       setComparison({
@@ -83,6 +84,7 @@ export default function ComparisonForm() {
           <QueryGroup
             query={query}
             timestamp={comparison.timestamp}
+            id={comparison.id}
             responses={comparison.responses}
             onRatingChange={handleRatingChange}
           />

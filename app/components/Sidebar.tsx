@@ -9,6 +9,7 @@ import DeleteButton from "./DeleteButton";
 import Chevron from "./Chevron";
 
 interface QueryHistory {
+  id: string;
   query: string;
   timestamp: number;
 }
@@ -29,10 +30,10 @@ export default function Sidebar() {
   const { history, deleteFromHistory } = useStorage();
   const [isRecentQueriesOpen, setIsRecentQueriesOpen] = useState(true);
 
-  const recentQueries = history.slice(0, 5).map((item) => ({
-    query: item.query,
-    timestamp: item.timestamp,
-  }));
+  // Get the 5 most recent queries
+  const recentQueries = history
+    .slice(0, 5)
+    .map(({ query, timestamp, id }) => ({ query, timestamp, id }));
 
   return (
     <div className="sticky top-0 h-screen overflow-y-auto border-r border-gray-200 shadow-[1px_0_5px_0_rgba(0,0,0,0.05)] p-4 flex flex-col">
@@ -69,9 +70,9 @@ export default function Sidebar() {
               isRecentQueriesOpen ? "max-h-[calc(100vh-350px)]" : "max-h-0"
             }`}
           >
-            {recentQueries.map(({ query, timestamp }) => (
+            {recentQueries.map(({ query, timestamp, id }) => (
               <div
-                key={timestamp}
+                key={id}
                 className="group relative block text-sm rounded p-1"
               >
                 <Link
@@ -85,7 +86,7 @@ export default function Sidebar() {
                 </Link>
                 <div className="absolute right-2 top-1/2 -translate-y-1/2">
                   <DeleteButton
-                    onDelete={() => deleteFromHistory(timestamp)}
+                    onDelete={() => deleteFromHistory(id)}
                     size="sm"
                     showOnHover
                   />

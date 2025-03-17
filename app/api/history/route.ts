@@ -5,9 +5,7 @@ interface QueryHistory {
   id: string;
   query: string;
   timestamp: number;
-  responses: any;
-  created_at: Date;
-  updated_at: Date;
+  responses: any[];
 }
 
 // GET all history items
@@ -58,20 +56,17 @@ export async function POST(request: Request) {
 export async function DELETE(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const timestamp = searchParams.get("timestamp");
+    const id = searchParams.get("id");
 
-    if (!timestamp) {
-      return NextResponse.json(
-        { error: "Timestamp is required" },
-        { status: 400 }
-      );
+    if (!id) {
+      return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
 
-    await executeQuery('DELETE FROM "QueryHistory" WHERE timestamp = $1', [
-      timestamp,
-    ]);
-
-    return NextResponse.json({ message: "History item deleted" });
+    await executeQuery('DELETE FROM "QueryHistory" WHERE id = $1', [id]);
+    return NextResponse.json({
+      message: "History item deleted",
+      success: true,
+    });
   } catch (error) {
     console.error("Failed to delete history item:", error);
     return NextResponse.json(

@@ -15,8 +15,8 @@ interface StorageContextType {
   storageType: StorageType;
   setStorageType: (type: StorageType) => void;
   history: HistoryItem[];
-  addToHistory: (query: string, responses: AIResponse[]) => Promise<void>;
-  deleteFromHistory: (timestamp: number) => Promise<void>;
+  addToHistory: (query: string, responses: AIResponse[]) => Promise<string>;
+  deleteFromHistory: (id: string) => Promise<void>;
   updateResponseRating: (
     timestamp: number,
     responseIndex: number,
@@ -59,13 +59,14 @@ export function StorageProvider({ children }: { children: React.ReactNode }) {
   }, [storageType]);
 
   const addToHistory = async (query: string, responses: AIResponse[]) => {
-    await provider.addHistory(query, responses);
+    const id = await provider.addHistory(query, responses);
     const updatedHistory = await provider.getHistory();
     setHistory(updatedHistory);
+    return id;
   };
 
-  const deleteFromHistory = async (timestamp: number) => {
-    await provider.deleteHistory(timestamp);
+  const deleteFromHistory = async (id: string) => {
+    await provider.deleteHistory(id);
     const updatedHistory = await provider.getHistory();
     setHistory(updatedHistory);
   };

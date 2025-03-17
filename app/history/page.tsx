@@ -35,8 +35,9 @@ export default function History() {
             <QueryGroup
               query={item.query}
               timestamp={item.timestamp}
+              id={item.id}
               responses={item.responses}
-              onDelete={() => deleteFromHistory(item.timestamp)}
+              onDelete={() => deleteFromHistory(item.id)}
               onRatingChange={(responseIndex, rating) =>
                 rating &&
                 updateResponseRating(item.timestamp, responseIndex, rating)

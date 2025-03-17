@@ -16,14 +16,15 @@ export class PostgresStorageProvider implements StorageProvider {
     responses: AIResponse[],
     id?: string,
     timestamp?: number
-  ): Promise<void> {
+  ): Promise<string> {
+    const newId = id || uuidv4();
     const response = await fetch("/api/history", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        id: id || uuidv4(),
+        id: newId,
         query,
         timestamp: timestamp || Date.now(),
         responses,
@@ -33,10 +34,12 @@ export class PostgresStorageProvider implements StorageProvider {
     if (!response.ok) {
       throw new Error("Failed to add history to PostgreSQL");
     }
+
+    return newId;
   }
 
-  async deleteHistory(timestamp: number): Promise<void> {
-    const response = await fetch(`/api/history?timestamp=${timestamp}`, {
+  async deleteHistory(id: string): Promise<void> {
+    const response = await fetch(`/api/history?id=${id}`, {
       method: "DELETE",
     });
 

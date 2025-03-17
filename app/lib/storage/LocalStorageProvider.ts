@@ -34,21 +34,28 @@ export class LocalStorageProvider implements StorageProvider {
     return this.getStoredHistory();
   }
 
-  async addHistory(query: string, responses: AIResponse[]): Promise<void> {
+  async addHistory(
+    query: string,
+    responses: AIResponse[],
+    id?: string,
+    timestamp?: number
+  ): Promise<string> {
     const history = this.getStoredHistory();
+    const newId = id || uuidv4();
     const newItem: HistoryItem = {
-      id: uuidv4(),
+      id: newId,
       query,
-      timestamp: Date.now(),
+      timestamp: timestamp || Date.now(),
       responses,
     };
     history.unshift(newItem);
     this.setStoredHistory(history);
+    return newId;
   }
 
-  async deleteHistory(timestamp: number): Promise<void> {
+  async deleteHistory(id: string): Promise<void> {
     const history = this.getStoredHistory();
-    const filtered = history.filter((item) => item.timestamp !== timestamp);
+    const filtered = history.filter((item) => item.id !== id);
     this.setStoredHistory(filtered);
   }
 

@@ -7,6 +7,7 @@ import DeleteButton from "./DeleteButton";
 interface QueryGroupProps {
   query: string;
   timestamp: number;
+  id?: string;
   responses: AIResponse[];
   onDelete?: () => void;
   onRatingChange?: (
@@ -20,6 +21,7 @@ interface QueryGroupProps {
 export default function QueryGroup({
   query,
   timestamp,
+  id,
   responses,
   onDelete,
   onRatingChange,
@@ -46,7 +48,7 @@ export default function QueryGroup({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {responses.map((response, index) => (
           <QueryResponseCard
-            key={index}
+            key={response.id || index}
             response={response}
             variant={variant}
             onRatingChange={
