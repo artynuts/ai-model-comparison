@@ -1,5 +1,6 @@
 import { AIResponse, ResponseRating } from "@/app/types";
 import { StorageProvider, HistoryItem } from "./StorageProvider";
+import { v4 as uuidv4 } from "uuid";
 
 export class PostgresStorageProvider implements StorageProvider {
   async getHistory(): Promise<HistoryItem[]> {
@@ -10,13 +11,23 @@ export class PostgresStorageProvider implements StorageProvider {
     return response.json();
   }
 
-  async addHistory(query: string, responses: AIResponse[]): Promise<void> {
+  async addHistory(
+    query: string,
+    responses: AIResponse[],
+    id?: string,
+    timestamp?: number
+  ): Promise<void> {
     const response = await fetch("/api/history", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ query, responses }),
+      body: JSON.stringify({
+        id: id || uuidv4(),
+        query,
+        timestamp: timestamp || Date.now(),
+        responses,
+      }),
     });
 
     if (!response.ok) {
@@ -25,7 +36,7 @@ export class PostgresStorageProvider implements StorageProvider {
   }
 
   async deleteHistory(timestamp: number): Promise<void> {
-    const response = await fetch(`/api/history/${timestamp}`, {
+    const response = await fetch(`/api/history?timestamp=${timestamp}`, {
       method: "DELETE",
     });
 
@@ -39,12 +50,12 @@ export class PostgresStorageProvider implements StorageProvider {
     responseIndex: number,
     rating: ResponseRating
   ): Promise<void> {
-    const response = await fetch(`/api/history/${timestamp}/rating`, {
+    const response = await fetch(`/api/history/rating`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ responseIndex, rating }),
+      body: JSON.stringify({ timestamp, responseIndex, rating }),
     });
 
     if (!response.ok) {

@@ -30,14 +30,18 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { query, timestamp, responses } = body;
+    const { id, query, timestamp, responses } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: "ID is required" }, { status: 400 });
+    }
 
     // Ensure responses is properly stringified for PostgreSQL JSONB
     const jsonResponses = JSON.stringify(responses);
 
     const [history] = await executeQuery<QueryHistory>(
-      'INSERT INTO "QueryHistory" (query, timestamp, responses) VALUES ($1, $2, $3::jsonb) RETURNING *',
-      [query, timestamp, jsonResponses]
+      'INSERT INTO "QueryHistory" (id, query, timestamp, responses) VALUES ($1, $2, $3, $4::jsonb) RETURNING *',
+      [id, query, timestamp, jsonResponses]
     );
 
     return NextResponse.json(history);

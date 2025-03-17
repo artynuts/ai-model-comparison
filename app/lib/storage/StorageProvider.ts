@@ -9,7 +9,12 @@ export interface HistoryItem {
 
 export interface StorageProvider {
   getHistory(): Promise<HistoryItem[]>;
-  addHistory(query: string, responses: AIResponse[]): Promise<void>;
+  addHistory(
+    query: string,
+    responses: AIResponse[],
+    id?: string,
+    timestamp?: number
+  ): Promise<void>;
   deleteHistory(timestamp: number): Promise<void>;
   updateResponseRating(
     timestamp: number,

@@ -35,7 +35,12 @@ export default function DataMigration() {
       // Migrate each item
       for (let i = 0; i < localData.length; i++) {
         const item = localData[i];
-        await pgProvider.addHistory(item.query, item.responses);
+        await pgProvider.addHistory(
+          item.query,
+          item.responses,
+          item.id,
+          item.timestamp
+        );
         setStatus(`Migrated ${i + 1} of ${localData.length} items...`);
       }
 
