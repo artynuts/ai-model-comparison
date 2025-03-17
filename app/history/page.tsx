@@ -39,8 +39,7 @@ export default function History() {
               responses={item.responses}
               onDelete={() => deleteFromHistory(item.id)}
               onRatingChange={(responseIndex, rating) =>
-                rating &&
-                updateResponseRating(item.timestamp, responseIndex, rating)
+                rating && updateResponseRating(item.id, responseIndex, rating)
               }
               isSelected={selectedQuery === item.query}
               variant="compact"
