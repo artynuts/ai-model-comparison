@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useStorage } from "../context/StorageContext";
 import StorageSelector from "./StorageSelector";
 import DeleteButton from "./DeleteButton";
+import Chevron from "./Chevron";
 
 interface QueryHistory {
   query: string;
@@ -61,21 +62,7 @@ export default function Sidebar() {
             className="flex items-center justify-between w-full text-sm font-semibold text-gray-500 mb-2 px-4 py-2 border border-gray-200 shadow-[1px_0_5px_0_rgba(0,0,0,0.05)] rounded-lg transition-colors hover:bg-gray-50"
           >
             <span>Recent Queries</span>
-            <svg
-              className={`w-4 h-4 transition-transform ${
-                isRecentQueriesOpen ? "rotate-180" : ""
-              }`}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
+            <Chevron direction={isRecentQueriesOpen ? "up" : "down"} />
           </button>
           <div
             className={`space-y-2 overflow-hidden transition-all duration-200 ${

@@ -1,6 +1,7 @@
 "use client";
 
 import { useStorage } from "../context/StorageContext";
+import Chevron from "./Chevron";
 
 interface StorageSelectorProps {
   variant?: "sidebar" | "settings";
@@ -30,19 +31,7 @@ export default function StorageSelector({
           <option value="localStorage">Browser Local Storage</option>
         </select>
         <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-          <svg
-            className="w-4 h-4 text-gray-500"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
+          <Chevron />
         </div>
       </div>
     </div>
