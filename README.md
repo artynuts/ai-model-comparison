@@ -237,6 +237,36 @@ The application supports two storage methods:
 
 Switch between storage options using the selector in the sidebar. Your preference is remembered across sessions.
 
+### Data Migration Between Storage Types
+
+The application provides functionality to migrate data between PostgreSQL and localStorage:
+
+1. **Manual Migration**
+
+   - Use the Data Migration tool in the Settings page
+   - Select the target storage type
+   - Click "Migrate Data" to start the process
+   - The tool will:
+     - Copy data from the source storage to the target storage
+     - Skip any duplicate entries
+     - Show progress and results of the migration
+     - List any queries that were skipped due to duplicates
+
+2. **Data Validation**
+
+   - After migration, use the Data Validation tool to ensure:
+     - All records were transferred correctly
+     - Data integrity is maintained
+     - No duplicate entries exist
+     - All required fields are present
+
+3. **Troubleshooting**
+   - If migration fails, check the browser console for error messages
+   - Use the Data Validation tool to identify and fix any issues
+   - The original data remains intact in the source storage
+
+Note: When migrating large datasets, the process may take a few moments. The application will show a progress indicator during migration.
+
 ## Contributing
 
 1. Fork the repository
