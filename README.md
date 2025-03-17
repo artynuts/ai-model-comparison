@@ -131,6 +131,56 @@ npm run dev
 
 5. Open [http://localhost:3000](http://localhost:3000) in your browser
 
+### Running PostgreSQL in Docker
+
+1. Make sure you have Docker installed on your system.
+
+2. Create a `.env` file in the root directory with your database configuration:
+
+```env
+POSTGRES_USER=your_db_user
+POSTGRES_PASSWORD=your_db_password
+POSTGRES_DB=aimc_db
+DATABASE_URL=postgresql://your_db_user:your_db_password@localhost:5432/aimc_db
+```
+
+3. Start the PostgreSQL container:
+
+```bash
+docker run --name aimc-postgres \
+  -e POSTGRES_USER=your_db_user \
+  -e POSTGRES_PASSWORD=your_db_password \
+  -e POSTGRES_DB=aimc_db \
+  -p 5432:5432 \
+  -d postgres:latest
+```
+
+4. Verify the container is running:
+
+```bash
+docker ps
+```
+
+5. To stop the container:
+
+```bash
+docker stop aimc-postgres
+```
+
+6. To start the container again:
+
+```bash
+docker start aimc-postgres
+```
+
+7. To remove the container:
+
+```bash
+docker rm aimc-postgres
+```
+
+Note: Make sure to replace `your_db_user` and `your_db_password` with secure values of your choice. The database will be accessible on port 5432.
+
 ### Data Management
 
 The application includes tools for managing your data:
