@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Chevron from "./Chevron";
 
 interface CollapsibleSectionProps {
   children: React.ReactNode;
@@ -19,22 +20,14 @@ export default function CollapsibleSection({
         onClick={() => setIsExpanded(!isExpanded)}
         className="flex items-center text-sm text-gray-500 hover:text-gray-700 mb-2"
       >
-        <svg
-          className={`w-4 h-4 mr-1 transition-transform ${
-            isExpanded ? "rotate-90" : ""
-          }`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+        <div
+          className={`transition-transform ${isExpanded ? "rotate-180" : ""}`}
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 5l7 7-7 7"
-          />
-        </svg>
-        {isExpanded ? "Hide Details" : "Show Details"}
+          <Chevron />
+        </div>
+        <span className="ml-1">
+          {isExpanded ? "Hide Details" : "Show Details"}
+        </span>
       </button>
       <div
         className={`overflow-hidden transition-all duration-200 ${
