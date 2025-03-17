@@ -5,11 +5,13 @@ import { LocalStorageProvider } from "../lib/storage/LocalStorageProvider";
 import { PostgresStorageProvider } from "../lib/storage/PostgresStorageProvider";
 import { useStorage } from "../context/StorageContext";
 import CollapsibleSection from "./CollapsibleSection";
+import { getStorageDisplayName } from "../lib/utils/storage";
 
 export default function DataDeletion() {
   const [status, setStatus] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const { storageType } = useStorage();
+  const storageDisplayName = getStorageDisplayName(storageType);
 
   const deleteAllData = async () => {
     if (
@@ -43,7 +45,7 @@ export default function DataDeletion() {
         localStorage.removeItem("queryHistory");
       }
 
-      setStatus(`Successfully deleted all data from ${storageType}`);
+      setStatus(`Successfully deleted all data from ${storageDisplayName}`);
     } catch (error) {
       console.error("Data deletion failed:", error);
       setStatus("Failed to delete data. Please try again.");
@@ -58,8 +60,7 @@ export default function DataDeletion() {
         <div>
           <h3 className="text-lg font-medium">Data Deletion</h3>
           <p className="text-sm text-gray-500">
-            Permanently delete all data from{" "}
-            {storageType === "postgres" ? "PostgreSQL" : "localStorage"}
+            Permanently delete all data from {storageDisplayName}
           </p>
         </div>
         <button
@@ -67,11 +68,7 @@ export default function DataDeletion() {
           disabled={isLoading}
           className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:bg-red-300 transition-colors"
         >
-          {isLoading
-            ? "Deleting..."
-            : `Delete All ${
-                storageType === "postgres" ? "PostgreSQL" : "Local Storage"
-              } Data`}
+          {isLoading ? "Deleting..." : `Delete All ${storageDisplayName} Data`}
         </button>
       </div>
       {status && (

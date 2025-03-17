@@ -7,6 +7,7 @@ import { useStorage } from "../context/StorageContext";
 import { HistoryItem } from "../lib/storage/StorageProvider";
 import { v4 as uuidv4 } from "uuid";
 import CollapsibleSection from "./CollapsibleSection";
+import { getStorageDisplayName } from "../lib/utils/storage";
 
 interface ValidationResult {
   totalItems: number;
@@ -22,6 +23,7 @@ export default function DataValidation() {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<ValidationResult | null>(null);
   const { storageType } = useStorage();
+  const storageDisplayName = getStorageDisplayName(storageType);
 
   const validateAndFixData = async () => {
     setIsLoading(true);
@@ -161,8 +163,7 @@ export default function DataValidation() {
         <div>
           <h3 className="text-lg font-medium">Data Validation</h3>
           <p className="text-sm text-gray-500">
-            Check and fix data integrity issues in{" "}
-            {storageType === "postgres" ? "PostgreSQL" : "localStorage"}
+            Check and fix data integrity issues in {storageDisplayName}
           </p>
         </div>
         <button
@@ -170,11 +171,7 @@ export default function DataValidation() {
           disabled={isLoading}
           className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-blue-300 transition-colors"
         >
-          {isLoading
-            ? "Validating..."
-            : `Fix ${
-                storageType === "postgres" ? "PostgreSQL" : "Local Storage"
-              } Data`}
+          {isLoading ? "Validating..." : `Fix ${storageDisplayName} Data`}
         </button>
       </div>
 
