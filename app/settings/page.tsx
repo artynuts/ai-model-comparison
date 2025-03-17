@@ -4,6 +4,7 @@ import { useStorage } from "../context/StorageContext";
 import Link from "next/link";
 import StorageSelector from "../components/StorageSelector";
 import DataMigration from "../components/DataMigration";
+import DataValidation from "../components/DataValidation";
 
 export default function SettingsPage() {
   return (
@@ -55,8 +56,26 @@ export default function SettingsPage() {
           </div>
         </section>
 
-        <section className="bg-white p-6 rounded-lg border border-gray-200 shadow-[1px_0_5px_0_rgba(0,0,0,0.05)]">
-          <DataMigration />
+        {/* Data Tools Section */}
+        <section className="bg-white border border-gray-200 shadow-[1px_0_5px_0_rgba(0,0,0,0.05)] rounded-lg p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            Data Tools
+          </h2>
+          <div className="prose prose-sm max-w-none mb-6">
+            <p className="text-gray-600">
+              Tools for managing and maintaining your data across storage
+              systems.
+            </p>
+          </div>
+
+          <div className="space-y-8">
+            <div className="border-b border-gray-200 pb-6">
+              <DataMigration />
+            </div>
+            <div>
+              <DataValidation />
+            </div>
+          </div>
         </section>
       </div>
     </div>
