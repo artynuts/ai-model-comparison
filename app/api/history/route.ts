@@ -105,9 +105,9 @@ export async function PUT(request: Request) {
 
     responses[responseIndex].rating = rating;
 
-    // Update the history item with the new responses
+    // Update the history item with the new responses and update the updatedAt timestamp
     await executeQuery(
-      'UPDATE "QueryHistory" SET responses = $1::jsonb WHERE id = $2',
+      'UPDATE "QueryHistory" SET responses = $1::jsonb, "updatedAt" = NOW() WHERE id = $2',
       [JSON.stringify(responses), id]
     );
 
