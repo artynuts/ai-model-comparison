@@ -38,7 +38,7 @@ export async function POST(request: Request) {
     const jsonResponses = JSON.stringify(responses);
 
     const [history] = await executeQuery<QueryHistory>(
-      'INSERT INTO "QueryHistory" (id, query, timestamp, responses) VALUES ($1, $2, $3, $4::jsonb) ON CONFLICT (id) DO NOTHING RETURNING *',
+      'INSERT INTO "QueryHistory" (id, query, timestamp, responses) VALUES ($1, $2, $3, $4::jsonb) ON CONFLICT (id) DO UPDATE SET query = EXCLUDED.query, timestamp = EXCLUDED.timestamp, responses = EXCLUDED.responses, "updatedAt" = NOW() RETURNING *',
       [id, query, timestamp, jsonResponses]
     );
 
