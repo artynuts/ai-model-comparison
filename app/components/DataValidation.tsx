@@ -11,6 +11,7 @@ interface ValidationResult {
   itemsWithMissingIds: number;
   responsesWithMissingIds: number;
   itemsFixed: number;
+  orderFixed: boolean;
 }
 
 export default function DataValidation() {
@@ -36,9 +37,10 @@ export default function DataValidation() {
       let itemsWithMissingIds = 0;
       let responsesWithMissingIds = 0;
       let itemsFixed = 0;
+      let orderFixed = false;
 
       // Validate and fix data
-      const fixedData = data.map((item: HistoryItem) => {
+      let fixedData = data.map((item: HistoryItem) => {
         let itemWasFixed = false;
 
         // Check item ID
@@ -68,8 +70,20 @@ export default function DataValidation() {
         };
       });
 
-      // Save fixed data back to localStorage
-      if (itemsFixed > 0) {
+      // Check if items are in correct order (most recent first)
+      const isCorrectOrder = fixedData.every((item, index) => {
+        if (index === 0) return true;
+        return item.timestamp <= fixedData[index - 1].timestamp;
+      });
+
+      if (!isCorrectOrder) {
+        fixedData.sort((a, b) => b.timestamp - a.timestamp);
+        orderFixed = true;
+        itemsFixed++;
+      }
+
+      // Save fixed data back to localStorage if any changes were made
+      if (itemsFixed > 0 || orderFixed) {
         localStorage.setItem("queryHistory", JSON.stringify(fixedData));
       }
 
@@ -78,11 +92,20 @@ export default function DataValidation() {
         itemsWithMissingIds,
         responsesWithMissingIds,
         itemsFixed,
+        orderFixed,
       });
 
+      const statusMessages = [];
+      if (itemsFixed > 0) {
+        statusMessages.push(`Fixed ${itemsFixed} items with ID issues`);
+      }
+      if (orderFixed) {
+        statusMessages.push("Fixed timestamp ordering");
+      }
+
       setStatus(
-        itemsFixed > 0
-          ? `Fixed ${itemsFixed} items with issues.`
+        statusMessages.length > 0
+          ? `${statusMessages.join(". ")}.`
           : "No issues found in localStorage data."
       );
     } catch (error) {
@@ -123,7 +146,15 @@ export default function DataValidation() {
               <li>
                 Responses with missing IDs: {result.responsesWithMissingIds}
               </li>
-              <li>Total items fixed: {result.itemsFixed}</li>
+              <li>
+                Items with fixed IDs:{" "}
+                {result.itemsFixed - (result.orderFixed ? 1 : 0)}
+              </li>
+              {result.orderFixed && (
+                <li className="text-amber-600">
+                  ⚠️ Fixed incorrect timestamp ordering
+                </li>
+              )}
             </ul>
           )}
         </div>
