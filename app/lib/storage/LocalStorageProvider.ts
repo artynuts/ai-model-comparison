@@ -42,6 +42,7 @@ export class LocalStorageProvider implements StorageProvider {
   ): Promise<{ id: string; skipped: boolean }> {
     const history = this.getStoredHistory();
     const newId = id || uuidv4();
+    const trimmedQuery = query.trim();
 
     // Check if item already exists
     const exists = history.some((item) => item.id === newId);
@@ -51,7 +52,7 @@ export class LocalStorageProvider implements StorageProvider {
 
     const newItem: HistoryItem = {
       id: newId,
-      query,
+      query: trimmedQuery,
       timestamp: timestamp || Date.now(),
       responses,
     };
