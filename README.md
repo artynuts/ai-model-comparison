@@ -9,6 +9,7 @@ This tool helps you evaluate and compare the performance of different AI models 
 - Rating responses across different categories (accuracy, clarity, etc.)
 - Tracking your rating history and model performance
 - Analyzing which models perform better in specific categories
+- Flexible storage options with PostgreSQL or localStorage
 
 ## Interface Showcase
 
@@ -44,6 +45,10 @@ Comprehensive view of all ratings, organized by category.
 - View response latency for each model
 - Markdown formatting support for responses
 - Query history with easy access to past comparisons
+- Flexible storage options:
+  - PostgreSQL database for persistent storage
+  - Browser localStorage for offline usage
+  - Easy switching between storage types
 - Responsive design for desktop and mobile
 - Dark/light mode support
 - Enhanced UI with:
@@ -52,6 +57,7 @@ Comprehensive view of all ratings, organized by category.
   - Consistent card styling with subtle borders
   - Full-width layout for better space utilization
   - Improved query history display
+  - Unified storage selector in sidebar
 - Rating system for responses:
   - Thumbs up/down ratings for multiple categories
   - Rating summary tables by model and category
@@ -79,6 +85,7 @@ Comprehensive view of all ratings, organized by category.
 
 - Node.js 18.x or higher
 - npm or yarn
+- PostgreSQL database (optional, for persistent storage)
 - API keys for the following services:
   - OpenAI API key
   - Anthropic API key
@@ -105,6 +112,7 @@ npm install
 OPENAI_API_KEY=your_openai_key
 ANTHROPIC_API_KEY=your_anthropic_key
 GEMINI_API_KEY=your_google_api_key
+DATABASE_URL=your_postgres_connection_string  # Optional, for PostgreSQL storage
 ```
 
 4. Run the development server:
@@ -124,6 +132,7 @@ npm run dev
 5. Access your query history in the sidebar
 6. View rating summaries in the dedicated ratings page
 7. Click on past queries to view previous comparisons
+8. Choose your preferred storage method (PostgreSQL or localStorage) from the sidebar
 
 ## Tech Stack
 
@@ -132,6 +141,7 @@ npm run dev
 - TypeScript
 - Tailwind CSS
 - DaisyUI
+- PostgreSQL (optional)
 - OpenAI API
 - Anthropic API
 - Google Generative AI API
@@ -143,12 +153,18 @@ ai-model-comparison/
 ├── app/
 │   ├── api/           # API routes
 │   ├── components/    # React components
-│   │   ├── ThumbsIcon.tsx    # Shared rating icon component
-│   │   ├── ThumbsRating.tsx  # Rating control component
+│   │   ├── ThumbsIcon.tsx     # Shared rating icon component
+│   │   ├── ThumbsRating.tsx   # Rating control component
+│   │   ├── StorageSelector.tsx # Storage type selector
 │   │   └── ...
 │   ├── context/      # React context
-│   │   ├── HistoryContext.tsx  # Query history management
+│   │   ├── StorageContext.tsx # Storage management
 │   │   └── ...
+│   ├── lib/
+│   │   └── storage/  # Storage providers
+│   │       ├── PostgresStorageProvider.ts
+│   │       ├── LocalStorageProvider.ts
+│   │       └── StorageProvider.ts
 │   ├── history/      # History page
 │   ├── ratings/      # Ratings summary page
 │   ├── types/        # TypeScript types
@@ -161,16 +177,33 @@ ai-model-comparison/
 
 The application supports rating responses across multiple categories:
 
-- Accuracy
-- Clarity
-- Completeness
-- Relevance
-- Usefulness
+- Accuracy: Were there any factual errors?
+- Relevance: Did it fully answer the question?
+- Completeness: Was anything missing?
+- Conciseness: Was the response straight to the point?
+- Unbiased: Did you detect any bias in the response?
 
 Each category can be rated with thumbs up or down, and ratings are summarized in:
 
 - Per-model view: Shows ratings grouped by AI model
 - Per-category view: Shows ratings grouped by category
+
+## Storage Options
+
+The application supports two storage methods:
+
+1. **PostgreSQL Database**
+
+   - Persistent storage across sessions
+   - Suitable for production use
+   - Requires database setup
+
+2. **Browser localStorage**
+   - Works offline
+   - No setup required
+   - Data persists in the browser
+
+Switch between storage options using the selector in the sidebar. Your preference is remembered across sessions.
 
 ## Contributing
 
