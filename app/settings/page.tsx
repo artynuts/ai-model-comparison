@@ -3,6 +3,7 @@
 import { useStorage } from "../context/StorageContext";
 import Link from "next/link";
 import StorageSelector from "../components/StorageSelector";
+import DataMigration from "../components/DataMigration";
 
 export default function SettingsPage() {
   return (
@@ -52,6 +53,10 @@ export default function SettingsPage() {
               </ul>
             </div>
           </div>
+        </section>
+
+        <section className="bg-white p-6 rounded-lg border border-gray-200 shadow-[1px_0_5px_0_rgba(0,0,0,0.05)]">
+          <DataMigration />
         </section>
       </div>
     </div>
