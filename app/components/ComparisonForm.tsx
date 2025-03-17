@@ -10,7 +10,7 @@ interface ComparisonState {
   isLoading: boolean;
   responses: AIResponse[];
   timestamp: number;
-  id?: string;
+  id: string;
 }
 
 export default function ComparisonForm() {
@@ -19,6 +19,7 @@ export default function ComparisonForm() {
     isLoading: false,
     responses: [],
     timestamp: 0,
+    id: "",
   });
   const { addToHistory, updateResponseRating } = useStorage();
 
@@ -39,6 +40,7 @@ export default function ComparisonForm() {
         isLoading: false,
         responses: [],
         timestamp: 0,
+        id: "",
       });
     }
   };
