@@ -50,6 +50,12 @@ export default function DataValidation() {
           itemWasFixed = true;
         }
 
+        // Trim query
+        const trimmedQuery = item.query.trim();
+        if (trimmedQuery !== item.query) {
+          itemWasFixed = true;
+        }
+
         // Check response IDs
         const fixedResponses = item.responses.map((response) => {
           if (!response.id || response.id.trim() === "") {
@@ -66,6 +72,7 @@ export default function DataValidation() {
 
         return {
           ...item,
+          query: trimmedQuery,
           responses: fixedResponses,
         };
       });
