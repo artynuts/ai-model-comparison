@@ -170,7 +170,11 @@ export default function DataValidation() {
           disabled={isLoading}
           className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-blue-300 transition-colors"
         >
-          {isLoading ? "Validating..." : "Validate & Fix Data"}
+          {isLoading
+            ? "Validating..."
+            : `Fix ${
+                storageType === "postgres" ? "PostgreSQL" : "Local Storage"
+              } Data`}
         </button>
       </div>
 

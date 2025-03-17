@@ -67,7 +67,11 @@ export default function DataDeletion() {
           disabled={isLoading}
           className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:bg-red-300 transition-colors"
         >
-          {isLoading ? "Deleting..." : "Delete All Data"}
+          {isLoading
+            ? "Deleting..."
+            : `Delete All ${
+                storageType === "postgres" ? "PostgreSQL" : "Local Storage"
+              } Data`}
         </button>
       </div>
       {status && (
