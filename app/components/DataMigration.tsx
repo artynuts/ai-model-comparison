@@ -4,15 +4,18 @@ import { useState } from "react";
 import { LocalStorageProvider } from "../lib/storage/LocalStorageProvider";
 import { PostgresStorageProvider } from "../lib/storage/PostgresStorageProvider";
 import { useStorage } from "../context/StorageContext";
+import CollapsibleSection from "./CollapsibleSection";
 
 export default function DataMigration() {
   const [status, setStatus] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const { storageType } = useStorage();
+  const [skippedQueries, setSkippedQueries] = useState<string[]>([]);
 
   const handleMigration = async () => {
     setIsLoading(true);
     setStatus("Starting migration...");
+    setSkippedQueries([]);
 
     try {
       // Get data from localStorage
@@ -33,7 +36,7 @@ export default function DataMigration() {
       const pgProvider = new PostgresStorageProvider();
       let migrated = 0;
       let skipped = 0;
-      const skippedQueries: string[] = [];
+      const skippedList: string[] = [];
 
       // Migrate each item
       for (let i = 0; i < localData.length; i++) {
@@ -47,7 +50,7 @@ export default function DataMigration() {
 
         if (result.skipped) {
           skipped++;
-          skippedQueries.push(item.query);
+          skippedList.push(item.query);
         } else {
           migrated++;
         }
@@ -59,15 +62,9 @@ export default function DataMigration() {
         );
       }
 
-      const skippedDetails =
-        skippedQueries.length > 0
-          ? `\n\nSkipped queries:\n${skippedQueries
-              .map((q) => `- "${q}"`)
-              .join("\n")}`
-          : "";
-
+      setSkippedQueries(skippedList);
       setStatus(
-        `Migration complete: ${migrated} items migrated, ${skipped} items skipped.${skippedDetails}`
+        `Migration complete: ${migrated} items migrated, ${skipped} items skipped.`
       );
     } catch (error) {
       console.error("Migration failed:", error);
@@ -97,8 +94,20 @@ export default function DataMigration() {
         </button>
       </div>
       {status && (
-        <div className="text-sm p-4 bg-gray-50 rounded-lg whitespace-pre-wrap">
+        <div className="text-sm p-4 bg-gray-50 rounded-lg">
           <p>{status}</p>
+          {skippedQueries.length > 0 && (
+            <CollapsibleSection isOpen={false}>
+              <div className="mt-2 text-gray-600">
+                <p className="font-medium mb-1">Skipped queries:</p>
+                <ul className="space-y-1 list-disc pl-4">
+                  {skippedQueries.map((query, index) => (
+                    <li key={index}>"{query}"</li>
+                  ))}
+                </ul>
+              </div>
+            </CollapsibleSection>
+          )}
         </div>
       )}
       {storageType !== "postgres" && (

@@ -5,6 +5,7 @@ import { LocalStorageProvider } from "../lib/storage/LocalStorageProvider";
 import { useStorage } from "../context/StorageContext";
 import { HistoryItem } from "../lib/storage/StorageProvider";
 import { v4 as uuidv4 } from "uuid";
+import CollapsibleSection from "../components/CollapsibleSection";
 
 interface ValidationResult {
   totalItems: number;
@@ -147,22 +148,24 @@ export default function DataValidation() {
         <div className="text-sm p-4 bg-gray-50 rounded-lg">
           <p>{status}</p>
           {result && (
-            <ul className="mt-2 space-y-1 text-gray-600">
-              <li>Total items checked: {result.totalItems}</li>
-              <li>Items with missing IDs: {result.itemsWithMissingIds}</li>
-              <li>
-                Responses with missing IDs: {result.responsesWithMissingIds}
-              </li>
-              <li>
-                Items with fixed IDs:{" "}
-                {result.itemsFixed - (result.orderFixed ? 1 : 0)}
-              </li>
-              {result.orderFixed && (
-                <li className="text-amber-600">
-                  ⚠️ Fixed incorrect timestamp ordering
+            <CollapsibleSection isOpen={false}>
+              <ul className="mt-2 space-y-1 text-gray-600">
+                <li>Total items checked: {result.totalItems}</li>
+                <li>Items with missing IDs: {result.itemsWithMissingIds}</li>
+                <li>
+                  Responses with missing IDs: {result.responsesWithMissingIds}
                 </li>
-              )}
-            </ul>
+                <li>
+                  Items with fixed IDs:{" "}
+                  {result.itemsFixed - (result.orderFixed ? 1 : 0)}
+                </li>
+                {result.orderFixed && (
+                  <li className="text-amber-600">
+                    ⚠️ Fixed incorrect timestamp ordering
+                  </li>
+                )}
+              </ul>
+            </CollapsibleSection>
           )}
         </div>
       )}
