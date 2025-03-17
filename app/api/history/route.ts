@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     const { query, timestamp, responses } = body;
 
     const [history] = await executeQuery<QueryHistory>(
-      'INSERT INTO "QueryHistory" (query, timestamp, responses, created_at, updated_at) VALUES ($1, $2, $3, NOW(), NOW()) RETURNING *',
+      'INSERT INTO "QueryHistory" (query, timestamp, responses) VALUES ($1, $2, $3) RETURNING *',
       [query, timestamp, responses]
     );
 
