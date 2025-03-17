@@ -20,16 +20,17 @@ export default function DeleteButton({
     }
   };
 
-  const baseClasses = "transition-colors p-1 hover:text-red-600";
-  const hoverClasses = showOnHover
-    ? "opacity-0 group-hover:opacity-100 transition-opacity"
+  const baseClasses =
+    "transition-colors p-1 hover:text-red-600 focus:text-red-600";
+  const visibilityClasses = showOnHover
+    ? "opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity"
     : "";
   const sizeClasses = size === "sm" ? "h-4 w-4" : "h-5 w-5";
 
   return (
     <button
       onClick={handleClick}
-      className={`${baseClasses} ${hoverClasses} ${className}`}
+      className={`${baseClasses} ${visibilityClasses} ${className}`}
       title="Delete query"
     >
       <svg
