@@ -18,7 +18,7 @@ interface StorageContextType {
   addToHistory: (query: string, responses: AIResponse[]) => Promise<string>;
   deleteFromHistory: (id: string) => Promise<void>;
   updateResponseRating: (
-    timestamp: number,
+    id: string,
     responseIndex: number,
     rating: ResponseRating
   ) => Promise<void>;
@@ -72,11 +72,11 @@ export function StorageProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateResponseRating = async (
-    timestamp: number,
+    id: string,
     responseIndex: number,
     rating: ResponseRating
   ) => {
-    await provider.updateResponseRating(timestamp, responseIndex, rating);
+    await provider.updateResponseRating(id, responseIndex, rating);
     const updatedHistory = await provider.getHistory();
     setHistory(updatedHistory);
   };

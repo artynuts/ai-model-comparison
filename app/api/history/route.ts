@@ -75,3 +75,48 @@ export async function DELETE(request: Request) {
     );
   }
 }
+
+// PUT update rating
+export async function PUT(request: Request) {
+  try {
+    const { id, responseIndex, rating } = await request.json();
+
+    // First, get the current history item
+    const result = await executeQuery<QueryHistory>(
+      'SELECT responses FROM "QueryHistory" WHERE id = $1',
+      [id]
+    );
+
+    if (result.length === 0) {
+      return NextResponse.json(
+        { error: "History item not found" },
+        { status: 404 }
+      );
+    }
+
+    // Update the rating in the responses array
+    const responses = result[0].responses;
+    if (!responses[responseIndex]) {
+      return NextResponse.json(
+        { error: "Response index out of bounds" },
+        { status: 400 }
+      );
+    }
+
+    responses[responseIndex].rating = rating;
+
+    // Update the history item with the new responses
+    await executeQuery(
+      'UPDATE "QueryHistory" SET responses = $1::jsonb WHERE id = $2',
+      [JSON.stringify(responses), id]
+    );
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Failed to update rating:", error);
+    return NextResponse.json(
+      { error: "Failed to update rating" },
+      { status: 500 }
+    );
+  }
+}

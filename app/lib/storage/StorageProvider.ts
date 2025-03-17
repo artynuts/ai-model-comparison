@@ -17,7 +17,7 @@ export interface StorageProvider {
   ): Promise<string>;
   deleteHistory(id: string): Promise<void>;
   updateResponseRating(
-    timestamp: number,
+    id: string,
     responseIndex: number,
     rating: ResponseRating
   ): Promise<void>;

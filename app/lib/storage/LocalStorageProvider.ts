@@ -60,13 +60,13 @@ export class LocalStorageProvider implements StorageProvider {
   }
 
   async updateResponseRating(
-    timestamp: number,
+    id: string,
     responseIndex: number,
     rating: ResponseRating
   ): Promise<void> {
     const history = this.getStoredHistory();
     const updated = history.map((item) => {
-      if (item.timestamp === timestamp && item.responses[responseIndex]) {
+      if (item.id === id && item.responses[responseIndex]) {
         return {
           ...item,
           responses: item.responses.map((response, index) =>

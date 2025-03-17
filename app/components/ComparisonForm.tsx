@@ -46,7 +46,7 @@ export default function ComparisonForm() {
   };
 
   const handleRatingChange = (index: number, rating: AIResponse["rating"]) => {
-    if (!comparison.timestamp || !rating) return;
+    if (!comparison.id || !rating) return;
 
     setComparison((prev) => {
       const newResponses = [...prev.responses];
@@ -58,7 +58,7 @@ export default function ComparisonForm() {
     });
 
     // Also update the rating in history
-    updateResponseRating(comparison.timestamp, index, rating);
+    updateResponseRating(comparison.id, index, rating);
   };
 
   return (

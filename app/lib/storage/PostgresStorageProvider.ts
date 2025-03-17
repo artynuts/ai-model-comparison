@@ -49,16 +49,20 @@ export class PostgresStorageProvider implements StorageProvider {
   }
 
   async updateResponseRating(
-    timestamp: number,
+    id: string,
     responseIndex: number,
     rating: ResponseRating
   ): Promise<void> {
-    const response = await fetch(`/api/history/rating`, {
+    const response = await fetch("/api/history", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ timestamp, responseIndex, rating }),
+      body: JSON.stringify({
+        id,
+        responseIndex,
+        rating,
+      }),
     });
 
     if (!response.ok) {
