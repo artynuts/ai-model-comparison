@@ -32,9 +32,12 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { query, timestamp, responses } = body;
 
+    // Ensure responses is properly stringified for PostgreSQL JSONB
+    const jsonResponses = JSON.stringify(responses);
+
     const [history] = await executeQuery<QueryHistory>(
-      'INSERT INTO "QueryHistory" (query, timestamp, responses) VALUES ($1, $2, $3) RETURNING *',
-      [query, timestamp, responses]
+      'INSERT INTO "QueryHistory" (query, timestamp, responses) VALUES ($1, $2, $3::jsonb) RETURNING *',
+      [query, timestamp, jsonResponses]
     );
 
     return NextResponse.json(history);
