@@ -25,7 +25,7 @@ export default function StorageSelector({
           onChange={(e) =>
             setStorageType(e.target.value as "postgres" | "localStorage")
           }
-          className="w-full border border-gray-200 shadow-[1px_0_5px_0_rgba(0,0,0,0.05)] rounded-lg px-4 py-1.5 text-sm bg-white transition-colors appearance-none"
+          className="w-full border-standard rounded-lg px-4 py-1.5 text-sm bg-white transition-colors appearance-none"
         >
           <option value="postgres">PostgreSQL Database</option>
           <option value="localStorage">Browser Local Storage</option>

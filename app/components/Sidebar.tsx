@@ -36,14 +36,14 @@ export default function Sidebar() {
     .map(({ query, timestamp, id }) => ({ query, timestamp, id }));
 
   return (
-    <div className="sticky top-0 h-screen overflow-y-auto border-r border-gray-200 shadow-[1px_0_5px_0_rgba(0,0,0,0.05)] p-4 flex flex-col">
+    <div className="sticky top-0 h-screen overflow-y-auto border-standard p-4 flex flex-col">
       <nav className="flex-1 overflow-y-auto">
         <ul className="space-y-2 p-1">
           {LINKS.map(({ href, label }) => (
             <li key={href}>
               <Link
                 href={href}
-                className={`block px-4 py-2 border border-gray-200 shadow-[1px_0_5px_0_rgba(0,0,0,0.05)] rounded-lg transition-colors ${
+                className={`block px-4 py-2 border-standard rounded-lg transition-colors ${
                   pathname === href
                     ? "bg-blue-50 text-blue-700 border-blue-200"
                     : "text-gray-600 hover:bg-gray-50"
@@ -60,7 +60,7 @@ export default function Sidebar() {
         <div className="mt-6 p-1">
           <button
             onClick={() => setIsRecentQueriesOpen(!isRecentQueriesOpen)}
-            className="flex items-center justify-between w-full text-sm font-semibold text-gray-500 mb-2 px-4 py-2 border border-gray-200 shadow-[1px_0_5px_0_rgba(0,0,0,0.05)] rounded-lg transition-colors hover:bg-gray-50"
+            className="flex items-center justify-between w-full text-sm font-semibold text-gray-500 mb-2 px-4 py-2 border-standard rounded-lg transition-colors hover:bg-gray-50"
           >
             <span>Recent Queries</span>
             <Chevron direction={isRecentQueriesOpen ? "up" : "down"} />
@@ -77,7 +77,7 @@ export default function Sidebar() {
               >
                 <Link
                   href={`/history?query=${encodeURIComponent(query)}`}
-                  className="block p-2 border border-gray-200 shadow-[1px_0_5px_0_rgba(0,0,0,0.05)] rounded-lg transition-colors hover:bg-gray-50"
+                  className="block p-2 border-standard rounded-lg transition-colors hover:bg-gray-50"
                 >
                   <p className="truncate pr-6">{query}</p>
                   <p className="text-xs text-gray-500">

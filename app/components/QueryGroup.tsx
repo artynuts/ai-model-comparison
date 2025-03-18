@@ -30,7 +30,7 @@ export default function QueryGroup({
 }: QueryGroupProps) {
   return (
     <div
-      className={`bg-white border border-gray-200 shadow-[1px_0_5px_0_rgba(0,0,0,0.05)] rounded-lg p-4 ${
+      className={`bg-white border-standard rounded-lg p-4 ${
         isSelected ? "ring-2 ring-blue-500" : ""
       }`}
     >

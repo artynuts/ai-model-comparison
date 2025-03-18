@@ -29,6 +29,12 @@ body {
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .border-standard {
+    @apply border border-gray-200 shadow-[1px_0_5px_0_rgba(0,0,0,0.05)];
+  }
+}
+
 @layer base {
   *:focus {
     @apply outline-none ring-1 ring-blue-500;
