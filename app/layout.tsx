@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 import Sidebar from "./components/Sidebar";
@@ -20,6 +20,9 @@ export const metadata: Metadata = {
     ],
   },
   manifest: "/manifest.json",
+};
+
+export const viewport: Viewport = {
   themeColor: "#4F46E5",
 };
 
