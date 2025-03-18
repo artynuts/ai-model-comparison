@@ -24,7 +24,7 @@ export default function Logo() {
         x2="256"
         y2="356"
         stroke="#4F46E5"
-        stroke-width="8"
+        strokeWidth="8"
       />
       <line
         x1="156"
@@ -32,7 +32,7 @@ export default function Logo() {
         x2="356"
         y2="256"
         stroke="#4F46E5"
-        stroke-width="8"
+        strokeWidth="8"
       />
 
       {/* Dots representing AI models */}
