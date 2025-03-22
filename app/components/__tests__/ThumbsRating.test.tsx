@@ -106,7 +106,6 @@ describe("ThumbsRating", () => {
     // High rating (80%) should have a positive visual indication
     const highRatingElement = screen.getByText("80% positive");
     expect(highRatingElement).toBeVisible();
-    // Get computed style to verify it appears with positive styling
     expect(highRatingElement.title).toContain(
       "80% of rated categories are positive"
     );
