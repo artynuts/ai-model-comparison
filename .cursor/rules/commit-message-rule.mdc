@@ -1,0 +1,12 @@
+---
+description: Generate commit messages automatically
+globs: *
+alwaysApply: true
+---
+
+# Generate Commit Message
+- At the end of every response, provide a brief, copyable commit message that summarizes the changes made during the conversation.
+- Format the commit message with a clear title line followed by a blank line and descriptive bullet points.
+- Structure the commit message in a code block for easy copying.
+- Include the scope of changes, what was modified, and why the changes are valuable.
+- Only include a commit message when actual code changes have been made. 
