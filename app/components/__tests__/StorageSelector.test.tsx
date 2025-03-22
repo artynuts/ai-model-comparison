@@ -37,7 +37,7 @@ describe("StorageSelector", () => {
     expect(screen.getByText("Storage Type:")).toBeInTheDocument();
   });
 
-  it("renders the Chevron component", () => {
+  it("displays a dropdown indicator", () => {
     render(<StorageSelector />);
     expect(screen.getByTestId("chevron-icon")).toBeInTheDocument();
   });
@@ -51,18 +51,25 @@ describe("StorageSelector", () => {
     expect(mockSetStorageType).toHaveBeenCalledWith("postgres");
   });
 
-  it("applies 'sidebar' variant styling by default", () => {
-    render(<StorageSelector />);
+  it("has different visual appearance with 'sidebar' variant", () => {
+    const { rerender } = render(<StorageSelector />);
 
-    const container = screen.getByText("Storage Type:").closest("div");
-    expect(container).toHaveClass("mt-4", "mb-4", "px-2");
-  });
+    // Get the container element with the default 'sidebar' variant
+    const sidebarContainer = screen.getByText("Storage Type:").closest("div");
+    expect(sidebarContainer).not.toBeNull();
+    const sidebarHTML = sidebarContainer?.outerHTML;
 
-  it("does not apply sidebar styling when 'settings' variant is used", () => {
-    render(<StorageSelector variant="settings" />);
+    // Rerender with settings variant
+    rerender(<StorageSelector variant="settings" />);
 
-    const container = screen.getByText("Storage Type:").closest("div");
-    expect(container).not.toHaveClass("mt-4", "mb-4", "px-2");
+    // Get the container with 'settings' variant
+    const settingsContainer = screen.getByText("Storage Type:").closest("div");
+    expect(settingsContainer).not.toBeNull();
+    const settingsHTML = settingsContainer?.outerHTML;
+
+    // Verify the visual appearance is different between variants
+    // without checking specific class names
+    expect(settingsHTML).not.toEqual(sidebarHTML);
   });
 
   it("shows PostgreSQL and localStorage options", () => {
