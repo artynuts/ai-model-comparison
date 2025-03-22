@@ -91,18 +91,46 @@ describe("DeleteButton", () => {
     expect(mockOnDelete).not.toHaveBeenCalled();
   });
 
-  it("prevents default event behavior", () => {
-    render(<DeleteButton onDelete={mockOnDelete} />);
+  it("prevents navigation when used within a link", () => {
+    // Store the original location
+    const originalLocation = window.location;
 
-    const button = screen.getByRole("button");
-    const mockEvent = {
-      preventDefault: jest.fn(),
-    };
+    // Create a mock location object
+    const mockLocation = { href: "http://original-url.com" } as Location;
 
-    // Manually call the onClick handler with our mock event
-    fireEvent.click(button, mockEvent);
+    // Replace window.location with our mock
+    Object.defineProperty(window, "location", {
+      configurable: true,
+      value: mockLocation,
+      writable: true,
+    });
 
-    // Unfortunately fireEvent doesn't allow us to spy on preventDefault directly
-    // so we can't easily test this behavior without restructuring the component
+    // Return true for confirm to ensure the event flow continues
+    (window.confirm as jest.Mock).mockReturnValue(true);
+
+    // Render the delete button inside a link
+    render(
+      <a href="http://different-url.com" data-testid="parent-link">
+        Test Link
+        <DeleteButton onDelete={mockOnDelete} />
+      </a>
+    );
+
+    // Find and click the delete button
+    const button = screen.getByRole("button", { name: /delete query/i });
+    fireEvent.click(button);
+
+    // Check that:
+    // 1. The onDelete function was called (confirmation was accepted)
+    // 2. The URL did not change (navigation was prevented)
+    expect(mockOnDelete).toHaveBeenCalledTimes(1);
+    expect(window.location.href).toBe("http://original-url.com");
+
+    // Restore original location
+    Object.defineProperty(window, "location", {
+      configurable: true,
+      value: originalLocation,
+      writable: true,
+    });
   });
 });
