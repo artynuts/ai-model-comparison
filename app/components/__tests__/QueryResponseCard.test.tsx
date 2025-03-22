@@ -34,9 +34,10 @@ describe("QueryResponseCard", () => {
 
   const mockOnRatingChange = jest.fn();
 
-  it("renders model information correctly", () => {
+  it("displays model information to the user", () => {
     render(<QueryResponseCard response={mockResponse} />);
 
+    // Verify the key information that users would see is displayed
     expect(screen.getByText("Model X")).toBeInTheDocument();
     expect(screen.getByText("Provider A")).toBeInTheDocument();
     expect(screen.getByText("1.0.0")).toBeInTheDocument();
@@ -44,15 +45,15 @@ describe("QueryResponseCard", () => {
     expect(screen.getByText("Latency: 500ms")).toBeInTheDocument();
   });
 
-  it("renders the response content in the MarkdownResponse component", () => {
+  it("shows the AI response content to the user", () => {
     render(<QueryResponseCard response={mockResponse} />);
 
-    const markdownResponse = screen.getByTestId("markdown-response");
-    expect(markdownResponse).toBeInTheDocument();
-    expect(markdownResponse.textContent).toBe("This is a test response");
+    // Verify the response content is visible to the user
+    const responseContent = screen.getByText("This is a test response");
+    expect(responseContent).toBeVisible();
   });
 
-  it("renders ThumbsRating when onRatingChange is provided", () => {
+  it("includes rating functionality when enabled", () => {
     render(
       <QueryResponseCard
         response={mockResponse}
@@ -60,16 +61,18 @@ describe("QueryResponseCard", () => {
       />
     );
 
-    expect(screen.getByTestId("thumbs-rating")).toBeInTheDocument();
+    // Verify rating component is available for user interaction
+    expect(screen.getByTestId("thumbs-rating")).toBeVisible();
   });
 
-  it("does not render ThumbsRating when onRatingChange is not provided", () => {
+  it("excludes rating functionality when not enabled", () => {
     render(<QueryResponseCard response={mockResponse} />);
 
+    // Verify rating component is not shown when feature is disabled
     expect(screen.queryByTestId("thumbs-rating")).not.toBeInTheDocument();
   });
 
-  it("renders error message when response has an error", () => {
+  it("shows error message when AI response has failed", () => {
     const errorResponse = {
       ...mockResponse,
       error: "Something went wrong",
@@ -77,19 +80,25 @@ describe("QueryResponseCard", () => {
 
     render(<QueryResponseCard response={errorResponse} />);
 
-    expect(screen.getByText("Something went wrong")).toBeInTheDocument();
+    // Verify error message is displayed to the user
+    expect(screen.getByText("Something went wrong")).toBeVisible();
+
+    // Verify regular response content is not shown during errors
     expect(screen.queryByTestId("markdown-response")).not.toBeInTheDocument();
   });
 
-  it("renders in compact variant correctly", () => {
+  it("provides a compact view with less detailed information", () => {
     render(<QueryResponseCard response={mockResponse} variant="compact" />);
 
-    // In compact mode, version and description should not be shown
+    // Verify compact view hides certain less important details
     expect(screen.queryByText("1.0.0")).not.toBeInTheDocument();
     expect(screen.queryByText("A test model")).not.toBeInTheDocument();
 
-    // But model name and provider should still be visible
-    expect(screen.getByText("Model X")).toBeInTheDocument();
-    expect(screen.getByText("Provider A")).toBeInTheDocument();
+    // Verify essential information remains visible in compact view
+    expect(screen.getByText("Model X")).toBeVisible();
+    expect(screen.getByText("Provider A")).toBeVisible();
+
+    // Verify response content is still shown in compact view
+    expect(screen.getByText("This is a test response")).toBeVisible();
   });
 });
