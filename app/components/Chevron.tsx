@@ -17,6 +17,8 @@ export default function Chevron({
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
+      data-testid="chevron-icon"
+      aria-label={`chevron pointing ${direction}`}
     >
       <path
         strokeLinecap="round"
