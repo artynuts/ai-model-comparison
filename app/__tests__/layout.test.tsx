@@ -51,27 +51,21 @@ jest.mock("next/navigation", () => ({
   },
 }));
 
-// Create a custom render function that doesn't wrap in a div
-const renderWithoutWrapper = (ui: React.ReactElement) => {
-  // Extract the children from the layout component to test them directly
-  // This avoids the DOM nesting warning with html element
-  return render(ui, {
-    container: document.documentElement,
-    // Disable wrapper to prevent nesting issues
-    wrapper: undefined,
-  });
-};
-
 describe("RootLayout", () => {
+  // Instead of rendering the whole layout which causes DOM nesting issues,
+  // we'll extract just the components we need to test
   it("renders the layout content correctly", () => {
-    // Extract and test just the body content to avoid html nesting issues
-    const BodyContent = () => {
+    // Create a test component that just renders the inner content of the body
+    function BodyContent() {
+      // Get the body content from the layout
       const layout = RootLayout({
         children: <div data-testid="child-content">Test Content</div>,
       });
-      // Extract just the body content from the layout
-      return layout.props.children;
-    };
+
+      // Extract just the body's children to avoid nesting a body in a div during testing
+      const bodyProps = layout.props.children.props;
+      return <div className={bodyProps.className}>{bodyProps.children}</div>;
+    }
 
     const { getByTestId, getByText, getByRole } = render(<BodyContent />);
 
@@ -105,17 +99,20 @@ describe("RootLayout", () => {
   });
 
   it("applies the GeistSans font to the body", () => {
-    // Extract and test just the body element to avoid html nesting issues
-    const BodyContent = () => {
+    // Create a test component that just checks the body class name
+    function BodyClassTest() {
       const layout = RootLayout({ children: <div>Test Content</div> });
-      // Extract just the body content from the layout
-      return layout.props.children;
-    };
+      // Extract the className from the body element
+      const bodyClassName = layout.props.children.props.className;
+      return (
+        <div data-testid="body-class" className={bodyClassName}>
+          Test Content
+        </div>
+      );
+    }
 
-    const { getByText } = render(<BodyContent />);
-
-    const body = getByText(/AI Model Comparison/).closest("body");
-    expect(body).toHaveClass("geist-sans-font");
+    const { getByTestId } = render(<BodyClassTest />);
+    expect(getByTestId("body-class")).toHaveClass("geist-sans-font");
   });
 
   it("sets the HTML lang attribute to 'en'", () => {
