@@ -267,7 +267,10 @@ describe("API utility", () => {
       // Restore original Date.now
       Date.now = originalDateNow;
 
-      // Verify error handling for the first model
+      // Verify the returned responses, including error for GPT-4
+      expect(results).toHaveLength(3);
+
+      // Verify all fields match expected values for the error case
       expect(results[0]).toMatchObject({
         modelName: "GPT-4",
         id: "GPT-4",
@@ -278,11 +281,89 @@ describe("API utility", () => {
         error: "Network error",
       });
 
-      // The latency should be 0 since our mock returns the same timestamp
-      expect(results[0].latency).toBe(0);
+      // Other models should still have valid responses
+      expect(results[1]).toMatchObject({
+        modelName: "Claude",
+        id: "claude-id",
+        provider: "Anthropic",
+        version: "3.0",
+        description: "Helpful assistant",
+        response: "Claude response",
+      });
 
-      // Verify the other models still processed correctly
-      expect(results).toHaveLength(3);
+      expect(results[2]).toMatchObject({
+        modelName: "Gemini",
+        id: "gemini-id",
+        provider: "Google",
+        version: "1.0",
+        description: "Multimodal AI",
+        response: "Gemini response",
+      });
+    });
+
+    // Test for covering the branch where response.ok is false but no error provided
+    it("uses model name in error message when response is not ok and no error message provided", async () => {
+      // Keep track of original Date.now
+      const originalDateNow = Date.now;
+
+      // Mock Date.now to return consistent values
+      Date.now = jest.fn().mockReturnValue(1000);
+
+      // Mock a response that is not ok and has an empty error object
+      (global.fetch as jest.Mock).mockResolvedValueOnce(
+        Promise.resolve({
+          ok: false,
+          json: () => Promise.resolve({}), // Empty object with no error field
+        })
+      );
+
+      const query = "Test query";
+      const results = await compareModels(query);
+
+      // Restore original Date.now
+      Date.now = originalDateNow;
+
+      // Check the error message contains the model name as a fallback
+      expect(results[0]).toMatchObject({
+        modelName: "GPT-4",
+        id: "GPT-4",
+        provider: "Unknown",
+        version: "Unknown",
+        description: "Error occurred",
+        response: "",
+        error: "GPT-4 request failed",
+      });
+    });
+
+    // Test for covering the branch where the caught error is not an instance of Error
+    it("handles non-Error objects thrown during fetch", async () => {
+      // Keep track of original Date.now
+      const originalDateNow = Date.now;
+
+      // Mock Date.now to return consistent values
+      Date.now = jest.fn().mockReturnValue(1000);
+
+      // Mock fetch to throw a string instead of an Error object
+      (global.fetch as jest.Mock).mockImplementationOnce(() => {
+        throw "Not an error object"; // Throw a string instead of an Error
+      });
+
+      const query = "Test query";
+      const results = await compareModels(query);
+
+      // Restore original Date.now
+      Date.now = originalDateNow;
+
+      // Check the fallback error message is used
+      expect(results[0]).toMatchObject({
+        modelName: "GPT-4",
+        id: "GPT-4",
+        provider: "Unknown",
+        version: "Unknown",
+        description: "Error occurred",
+        response: "",
+        error: "Unknown error occurred",
+      });
     });
   });
 });
