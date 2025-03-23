@@ -23,7 +23,8 @@ type RatingResult = {
   isRated: boolean;
 };
 
-function calculateAverageRating(rating?: ResponseRating): RatingResult {
+// Export for testing
+export function calculateAverageRating(rating?: ResponseRating): RatingResult {
   if (!rating) return { text: "Not rated", percentage: 0, isRated: false };
 
   const values = RATING_CATEGORIES.map((category) => rating[category.key]);

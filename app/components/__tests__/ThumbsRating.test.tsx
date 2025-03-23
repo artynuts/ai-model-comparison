@@ -2,6 +2,10 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import ThumbsRating from "../ThumbsRating";
 import { RATING_CATEGORIES, ResponseRating } from "../../types";
 
+// Import calculateAverageRating for direct testing
+// @ts-ignore - Function is not exported but we're accessing it for testing
+import { calculateAverageRating } from "../ThumbsRating";
+
 describe("ThumbsRating", () => {
   const mockOnChange = jest.fn();
 
@@ -143,6 +147,22 @@ describe("ThumbsRating", () => {
     );
   });
 
+  it("correctly handles undefined rating", () => {
+    // Test with explicitly undefined rating
+    const { rerender } = render(
+      <ThumbsRating rating={undefined} onChange={mockOnChange} />
+    );
+
+    // Check that "Not rated" is displayed
+    const notRatedElement = screen.getByText("Not rated");
+    expect(notRatedElement).toBeInTheDocument();
+    expect(notRatedElement.title).toBe("No ratings yet");
+
+    // Verify the appropriate styling class is applied for unrated content
+    expect(notRatedElement.className).toContain("bg-gray-100");
+    expect(notRatedElement.className).toContain("text-gray-600");
+  });
+
   it("has visually distinct appearances for different rating levels", () => {
     const { rerender } = render(
       <ThumbsRating
@@ -191,5 +211,34 @@ describe("ThumbsRating", () => {
     expect(highRatingTitle).toContain("100% of rated categories are positive");
     expect(lowRatingTitle).toContain("0% of rated categories are positive");
     expect(notRatedTitle).toBe("No ratings yet");
+  });
+});
+
+// Add direct tests for the calculateAverageRating function
+describe("calculateAverageRating", () => {
+  it("returns the correct result for undefined rating", () => {
+    const result = calculateAverageRating(undefined);
+    expect(result).toEqual({
+      text: "Not rated",
+      percentage: 0,
+      isRated: false,
+    });
+  });
+
+  it("returns the correct result for empty rating (all nulls)", () => {
+    const emptyRating: ResponseRating = {
+      accuracy: null,
+      relevance: null,
+      completeness: null,
+      concise: null,
+      unbiased: null,
+    };
+
+    const result = calculateAverageRating(emptyRating);
+    expect(result).toEqual({
+      text: "Not rated",
+      percentage: 0,
+      isRated: false,
+    });
   });
 });
