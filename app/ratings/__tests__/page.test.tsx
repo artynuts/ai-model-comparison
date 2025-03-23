@@ -139,7 +139,8 @@ describe("RatingsPage", () => {
   it("displays query text with links to history", () => {
     render(<RatingsPage />);
 
-    // Get all query links (note: they appear twice because they're in both tables)
+    // Get all query links
+    // (note: they appear twice because they're in both tables: By Model and By Category)
     const query1Links = screen.getAllByText("Test query 1");
     const query2Links = screen.getAllByText("Test query 2");
 
