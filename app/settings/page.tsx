@@ -22,8 +22,17 @@ export default function SettingsPage() {
 
       <div className="space-y-8">
         {/* Storage Section */}
-        <section className="bg-white border-standard rounded-lg p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Storage</h2>
+        <section
+          className="bg-white border-standard rounded-lg p-6"
+          aria-labelledby="storage-heading"
+          role="region"
+        >
+          <h2
+            id="storage-heading"
+            className="text-xl font-semibold text-gray-900 mb-4"
+          >
+            Storage
+          </h2>
           <div className="prose prose-sm max-w-none mb-6">
             <p className="text-gray-600">
               Choose where to store your query history and ratings. You can
@@ -58,8 +67,15 @@ export default function SettingsPage() {
         </section>
 
         {/* Data Tools Section */}
-        <section className="bg-white border-standard rounded-lg p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+        <section
+          className="bg-white border-standard rounded-lg p-6"
+          aria-labelledby="data-tools-heading"
+          role="region"
+        >
+          <h2
+            id="data-tools-heading"
+            className="text-xl font-semibold text-gray-900 mb-4"
+          >
             Data Tools
           </h2>
           <div className="prose prose-sm max-w-none mb-6">
