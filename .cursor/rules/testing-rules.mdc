@@ -3,6 +3,25 @@ description:
 globs: *.test.tsx
 alwaysApply: false
 ---
+# Test Determinism Rules
+
+## All Tests Must Be Deterministic
+- Tests should always produce the same results when run multiple times under the same conditions
+- Never use conditional assertions that allow tests to pass regardless of specific outcomes
+- Avoid using `queryByText` followed by a conditional check that accepts both presence and absence
+- Mock data should be precisely configured to test specific scenarios with predictable outcomes
+- When testing conditional logic, create separate test cases for each distinct code path
+- Random values must be seeded or mocked to ensure consistent test behavior
+- Time-dependent tests should use fixed time values or mocks rather than actual time
+
+## Test Structure Best Practices
+- Each test should verify one specific behavior or code path
+- Test descriptions should clearly indicate what functionality is being tested
+- Use descriptive assertion messages that explain what the test is verifying
+- Group related tests together using nested describe blocks when appropriate
+- Mock external dependencies to isolate the code under test
+- Test both success and failure cases for complete coverage
+- When testing UI components, focus on user-visible behavior rather than implementation details 
 
 # Test Behavior, Not Implementation
 - **Focus on user outcomes and observable behavior** rather than internal implementation details.
