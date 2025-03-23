@@ -407,7 +407,7 @@ describe("DataValidation", () => {
       {
         id: "",
         query: "  query1  ",
-        timestamp: 1000, // Oldest first (correct order when reversed)
+        timestamp: 3000, // Newest first (correct order)
         responses: [
           {
             id: "",
@@ -423,7 +423,7 @@ describe("DataValidation", () => {
       {
         id: "id2",
         query: "  query2  ",
-        timestamp: 2000, // Middle
+        timestamp: 2000, // Middle (correct order)
         responses: [
           {
             id: "resp-id",
@@ -439,7 +439,7 @@ describe("DataValidation", () => {
       {
         id: "id3",
         query: "query3",
-        timestamp: 3000, // Newest last (correct order when reversed)
+        timestamp: 1000, // Oldest last (correct order)
         responses: [
           {
             id: "",
