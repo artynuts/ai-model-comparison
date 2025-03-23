@@ -5,13 +5,13 @@ import { RATING_CATEGORIES } from "../types";
 import Link from "next/link";
 import ThumbsIcon from "../components/ThumbsIcon";
 
-function getRatingColor(value: boolean | null) {
+export function getRatingColor(value: boolean | null) {
   if (value === true) return "bg-green-100 text-green-700";
   if (value === false) return "bg-red-100 text-red-700";
   return "bg-gray-50 text-gray-500";
 }
 
-function getRatingSymbol(value: boolean | null) {
+export function getRatingSymbol(value: boolean | null) {
   if (value === true) {
     return <ThumbsIcon direction="up" selected={true} className="w-4 h-4" />;
   }
