@@ -51,6 +51,11 @@ const mockFetch = (responseData: any, status = 200) => {
   });
 };
 
+// Mock function to set up fetch errors
+const mockFetchError = (errorMessage: string) => {
+  (global.fetch as jest.Mock).mockRejectedValueOnce(new Error(errorMessage));
+};
+
 // Mock component to test the hook
 function TestComponent() {
   const { history, addToHistory, deleteFromHistory, updateResponseRating } =
@@ -107,11 +112,13 @@ describe("HistoryContext", () => {
     // Set up fetch mock for initial data load
     mockFetch(mockHistoryData);
 
-    render(
-      <HistoryProvider>
-        <TestComponent />
-      </HistoryProvider>
-    );
+    await act(async () => {
+      render(
+        <HistoryProvider>
+          <TestComponent />
+        </HistoryProvider>
+      );
+    });
 
     // Wait for the history to be fetched
     await waitFor(() => {
@@ -126,11 +133,13 @@ describe("HistoryContext", () => {
     // Set up fetch mock for initial data load
     mockFetch(mockHistoryData);
 
-    render(
-      <HistoryProvider>
-        <TestComponent />
-      </HistoryProvider>
-    );
+    await act(async () => {
+      render(
+        <HistoryProvider>
+          <TestComponent />
+        </HistoryProvider>
+      );
+    });
 
     // Wait for initial history to load
     await waitFor(() => {
@@ -140,29 +149,8 @@ describe("HistoryContext", () => {
     // Set up fetch mocks for add operation
     mockFetch({ success: true }); // For POST request
 
-    // Set up fetch mock for updated data load after add
-    const updatedMockHistory = [
-      {
-        query: "New query",
-        timestamp: expect.any(Number),
-        responses: [
-          {
-            modelName: "Test Model",
-            id: "new-resp",
-            provider: "Test Provider",
-            version: "1.0",
-            description: "Test description",
-            response: "Test response",
-            latency: 150,
-          },
-        ],
-      },
-      ...mockHistoryData,
-    ];
-    mockFetch(updatedMockHistory);
-
     // Click the add button
-    act(() => {
+    await act(async () => {
       screen.getByTestId("add-button").click();
     });
 
@@ -186,11 +174,13 @@ describe("HistoryContext", () => {
     // Set up fetch mock for initial data load
     mockFetch(mockHistoryData);
 
-    render(
-      <HistoryProvider>
-        <TestComponent />
-      </HistoryProvider>
-    );
+    await act(async () => {
+      render(
+        <HistoryProvider>
+          <TestComponent />
+        </HistoryProvider>
+      );
+    });
 
     // Wait for initial history to load
     await waitFor(() => {
@@ -200,11 +190,8 @@ describe("HistoryContext", () => {
     // Set up fetch mocks for delete operation
     mockFetch({ success: true }); // For DELETE request
 
-    // Set up fetch mock for updated data load after delete
-    mockFetch([mockHistoryData[1]]); // Return only the second item
-
     // Click the delete button
-    act(() => {
+    await act(async () => {
       screen.getByTestId("delete-button").click();
     });
 
@@ -226,11 +213,13 @@ describe("HistoryContext", () => {
     // Set up fetch mock for initial data load
     mockFetch(mockHistoryData);
 
-    render(
-      <HistoryProvider>
-        <TestComponent />
-      </HistoryProvider>
-    );
+    await act(async () => {
+      render(
+        <HistoryProvider>
+          <TestComponent />
+        </HistoryProvider>
+      );
+    });
 
     // Wait for initial history to load
     await waitFor(() => {
@@ -240,19 +229,8 @@ describe("HistoryContext", () => {
     // Set up fetch mocks for rating update
     mockFetch({ success: true }); // For PUT request
 
-    // Set up fetch mock for updated data load after rating
-    const updatedMockHistory = [...mockHistoryData];
-    (updatedMockHistory[0].responses[0] as AIResponse).rating = {
-      accuracy: true,
-      relevance: true,
-      completeness: true,
-      concise: true,
-      unbiased: true,
-    };
-    mockFetch(updatedMockHistory);
-
     // Click the rate button
-    act(() => {
+    await act(async () => {
       screen.getByTestId("rate-button").click();
     });
 
@@ -267,9 +245,25 @@ describe("HistoryContext", () => {
         })
       );
     });
+
+    // Verify the content of the request body
+    const requestBody = JSON.parse(
+      (global.fetch as jest.Mock).mock.calls[1][1].body
+    );
+    expect(requestBody).toEqual({
+      timestamp: 1234567890,
+      responseIndex: 0,
+      rating: {
+        accuracy: true,
+        relevance: true,
+        completeness: true,
+        concise: true,
+        unbiased: true,
+      },
+    });
   });
 
-  test("handles API errors gracefully", async () => {
+  test("handles API errors gracefully during initial fetch", async () => {
     // Spy on console.error
     const consoleErrorSpy = jest
       .spyOn(console, "error")
@@ -278,11 +272,13 @@ describe("HistoryContext", () => {
     // Mock API error
     mockFetch(null, 500);
 
-    render(
-      <HistoryProvider>
-        <TestComponent />
-      </HistoryProvider>
-    );
+    await act(async () => {
+      render(
+        <HistoryProvider>
+          <TestComponent />
+        </HistoryProvider>
+      );
+    });
 
     // The error is caught and handled internally
     await waitFor(() => {
@@ -291,6 +287,303 @@ describe("HistoryContext", () => {
 
     // Check that fetch was called
     expect(global.fetch).toHaveBeenCalledWith("/api/history");
+
+    // Check that error was logged
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "Error fetching history:",
+      expect.any(Error)
+    );
+
+    // Restore console.error
+    consoleErrorSpy.mockRestore();
+  });
+
+  test("handles network errors gracefully during initial fetch", async () => {
+    // Spy on console.error
+    const consoleErrorSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
+    // Mock network error
+    mockFetchError("Network error");
+
+    await act(async () => {
+      render(
+        <HistoryProvider>
+          <TestComponent />
+        </HistoryProvider>
+      );
+    });
+
+    // The error is caught and handled internally
+    await waitFor(() => {
+      expect(screen.getByTestId("history-length").textContent).toBe("0");
+    });
+
+    // Check that fetch was called
+    expect(global.fetch).toHaveBeenCalledWith("/api/history");
+
+    // Check that error was logged
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "Error fetching history:",
+      expect.any(Error)
+    );
+
+    // Restore console.error
+    consoleErrorSpy.mockRestore();
+  });
+
+  test("handles API error when adding to history", async () => {
+    // Set up fetch mock for initial data load
+    mockFetch(mockHistoryData);
+
+    // Spy on console.error
+    const consoleErrorSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
+    await act(async () => {
+      render(
+        <HistoryProvider>
+          <TestComponent />
+        </HistoryProvider>
+      );
+    });
+
+    // Wait for initial history to load
+    await waitFor(() => {
+      expect(screen.getByTestId("history-length").textContent).toBe("2");
+    });
+
+    // Set up fetch mocks for add operation - with error
+    mockFetch(null, 400);
+
+    // Click the add button
+    await act(async () => {
+      screen.getByTestId("add-button").click();
+    });
+
+    // History should remain unchanged
+    expect(screen.getByTestId("history-length").textContent).toBe("2");
+    expect(screen.getByTestId("first-query").textContent).toBe("Test query 1");
+
+    // Check that error was logged
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "Error adding to history:",
+      expect.any(Error)
+    );
+
+    // Restore console.error
+    consoleErrorSpy.mockRestore();
+  });
+
+  test("handles network error when adding to history", async () => {
+    // Set up fetch mock for initial data load
+    mockFetch(mockHistoryData);
+
+    // Spy on console.error
+    const consoleErrorSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
+    await act(async () => {
+      render(
+        <HistoryProvider>
+          <TestComponent />
+        </HistoryProvider>
+      );
+    });
+
+    // Wait for initial history to load
+    await waitFor(() => {
+      expect(screen.getByTestId("history-length").textContent).toBe("2");
+    });
+
+    // Set up fetch mocks for add operation - with network error
+    mockFetchError("Network error during add");
+
+    // Click the add button
+    await act(async () => {
+      screen.getByTestId("add-button").click();
+    });
+
+    // History should remain unchanged
+    expect(screen.getByTestId("history-length").textContent).toBe("2");
+    expect(screen.getByTestId("first-query").textContent).toBe("Test query 1");
+
+    // Check that error was logged
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "Error adding to history:",
+      expect.any(Error)
+    );
+
+    // Restore console.error
+    consoleErrorSpy.mockRestore();
+  });
+
+  test("handles API error when deleting from history", async () => {
+    // Set up fetch mock for initial data load
+    mockFetch(mockHistoryData);
+
+    // Spy on console.error
+    const consoleErrorSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
+    await act(async () => {
+      render(
+        <HistoryProvider>
+          <TestComponent />
+        </HistoryProvider>
+      );
+    });
+
+    // Wait for initial history to load
+    await waitFor(() => {
+      expect(screen.getByTestId("history-length").textContent).toBe("2");
+    });
+
+    // Set up fetch mocks for delete operation - with error
+    mockFetch(null, 400);
+
+    // Click the delete button
+    await act(async () => {
+      screen.getByTestId("delete-button").click();
+    });
+
+    // History should remain unchanged
+    expect(screen.getByTestId("history-length").textContent).toBe("2");
+    expect(screen.getByTestId("first-query").textContent).toBe("Test query 1");
+
+    // Check that error was logged
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "Error deleting from history:",
+      expect.any(Error)
+    );
+
+    // Restore console.error
+    consoleErrorSpy.mockRestore();
+  });
+
+  test("handles network error when deleting from history", async () => {
+    // Set up fetch mock for initial data load
+    mockFetch(mockHistoryData);
+
+    // Spy on console.error
+    const consoleErrorSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
+    await act(async () => {
+      render(
+        <HistoryProvider>
+          <TestComponent />
+        </HistoryProvider>
+      );
+    });
+
+    // Wait for initial history to load
+    await waitFor(() => {
+      expect(screen.getByTestId("history-length").textContent).toBe("2");
+    });
+
+    // Set up fetch mocks for delete operation - with network error
+    mockFetchError("Network error during delete");
+
+    // Click the delete button
+    await act(async () => {
+      screen.getByTestId("delete-button").click();
+    });
+
+    // History should remain unchanged
+    expect(screen.getByTestId("history-length").textContent).toBe("2");
+    expect(screen.getByTestId("first-query").textContent).toBe("Test query 1");
+
+    // Check that error was logged
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "Error deleting from history:",
+      expect.any(Error)
+    );
+
+    // Restore console.error
+    consoleErrorSpy.mockRestore();
+  });
+
+  test("handles API error when updating response rating", async () => {
+    // Set up fetch mock for initial data load
+    mockFetch(mockHistoryData);
+
+    // Spy on console.error
+    const consoleErrorSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
+    await act(async () => {
+      render(
+        <HistoryProvider>
+          <TestComponent />
+        </HistoryProvider>
+      );
+    });
+
+    // Wait for initial history to load
+    await waitFor(() => {
+      expect(screen.getByTestId("history-length").textContent).toBe("2");
+    });
+
+    // Set up fetch mocks for rating update - with error
+    mockFetch(null, 400);
+
+    // Click the rate button
+    await act(async () => {
+      screen.getByTestId("rate-button").click();
+    });
+
+    // Check that error was logged
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "Error updating rating:",
+      expect.any(Error)
+    );
+
+    // Restore console.error
+    consoleErrorSpy.mockRestore();
+  });
+
+  test("handles network error when updating response rating", async () => {
+    // Set up fetch mock for initial data load
+    mockFetch(mockHistoryData);
+
+    // Spy on console.error
+    const consoleErrorSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
+    await act(async () => {
+      render(
+        <HistoryProvider>
+          <TestComponent />
+        </HistoryProvider>
+      );
+    });
+
+    // Wait for initial history to load
+    await waitFor(() => {
+      expect(screen.getByTestId("history-length").textContent).toBe("2");
+    });
+
+    // Set up fetch mocks for rating update - with network error
+    mockFetchError("Network error during rating update");
+
+    // Click the rate button
+    await act(async () => {
+      screen.getByTestId("rate-button").click();
+    });
+
+    // Check that error was logged
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "Error updating rating:",
+      expect.any(Error)
+    );
 
     // Restore console.error
     consoleErrorSpy.mockRestore();
@@ -302,9 +595,15 @@ describe("HistoryContext", () => {
       .spyOn(console, "error")
       .mockImplementation(() => {});
 
-    expect(() => {
+    // Using a function that wraps the render call
+    // This is important for catching errors properly
+    const renderWithoutProvider = () => {
       render(<TestComponent />);
-    }).toThrow("useHistory must be used within a HistoryProvider");
+    };
+
+    expect(renderWithoutProvider).toThrow(
+      "useHistory must be used within a HistoryProvider"
+    );
 
     consoleErrorSpy.mockRestore();
   });
