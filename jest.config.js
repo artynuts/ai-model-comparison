@@ -14,6 +14,18 @@ const customJestConfig = {
     "^@/(.*)$": "<rootDir>/$1",
   },
   testMatch: ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],
+  // Coverage configuration
+  collectCoverage: true,
+  coverageDirectory: "coverage",
+  collectCoverageFrom: [
+    "app/**/*.{js,jsx,ts,tsx}",
+    "!app/**/_*.{js,jsx,ts,tsx}",
+    "!app/**/*.d.ts",
+    "!app/api/**",
+    "!**/node_modules/**",
+    "!**/__tests__/**",
+  ],
+  coverageReporters: ["json", "lcov", "text", "clover", "html"],
 };
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
