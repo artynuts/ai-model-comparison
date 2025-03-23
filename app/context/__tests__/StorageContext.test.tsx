@@ -72,18 +72,23 @@ function TestComponent() {
       </button>
       <button
         data-testid="add-button"
-        onClick={() => {
-          addToHistory("New query", [
-            {
-              modelName: "Test Model",
-              id: "new-resp",
-              provider: "Test Provider",
-              version: "1.0",
-              description: "Test description",
-              response: "Test response",
-              latency: 150,
-            } as AIResponse,
-          ]);
+        onClick={async () => {
+          try {
+            await addToHistory("New query", [
+              {
+                modelName: "Test Model",
+                id: "new-resp",
+                provider: "Test Provider",
+                version: "1.0",
+                description: "Test description",
+                response: "Test response",
+                latency: 150,
+              } as AIResponse,
+            ]);
+          } catch (error) {
+            // In the real component, errors would be handled or bubble up
+            console.error(error);
+          }
         }}
       >
         Add
@@ -144,11 +149,13 @@ describe("StorageContext", () => {
   });
 
   test("provides history and uses postgres storage by default", async () => {
-    render(
-      <StorageProvider>
-        <TestComponent />
-      </StorageProvider>
-    );
+    await act(async () => {
+      render(
+        <StorageProvider>
+          <TestComponent />
+        </StorageProvider>
+      );
+    });
 
     // Check default storage type
     expect(screen.getByTestId("storage-type").textContent).toBe("postgres");
@@ -163,11 +170,13 @@ describe("StorageContext", () => {
   });
 
   test("switches between storage providers", async () => {
-    render(
-      <StorageProvider>
-        <TestComponent />
-      </StorageProvider>
-    );
+    await act(async () => {
+      render(
+        <StorageProvider>
+          <TestComponent />
+        </StorageProvider>
+      );
+    });
 
     // Wait for initial history load
     await waitFor(() => {
@@ -175,37 +184,31 @@ describe("StorageContext", () => {
     });
 
     // Switch to localStorage
-    act(() => {
+    await act(async () => {
       screen.getByTestId("toggle-storage").click();
     });
 
-    // Wait for the storage type to change and history to reload
-    await waitFor(() => {
-      expect(screen.getByTestId("storage-type").textContent).toBe(
-        "localStorage"
-      );
-    });
-
-    // Verify localStorage provider was called
+    // Verify storage type changed and localStorage provider was called
+    expect(screen.getByTestId("storage-type").textContent).toBe("localStorage");
     expect(LocalStorageProvider).toHaveBeenCalled();
 
     // Switch back to postgres
-    act(() => {
+    await act(async () => {
       screen.getByTestId("toggle-storage").click();
     });
 
-    // Wait for the storage type to change back
-    await waitFor(() => {
-      expect(screen.getByTestId("storage-type").textContent).toBe("postgres");
-    });
+    // Verify storage type changed back
+    expect(screen.getByTestId("storage-type").textContent).toBe("postgres");
   });
 
   test("saves storage preference to localStorage", async () => {
-    render(
-      <StorageProvider>
-        <TestComponent />
-      </StorageProvider>
-    );
+    await act(async () => {
+      render(
+        <StorageProvider>
+          <TestComponent />
+        </StorageProvider>
+      );
+    });
 
     // Wait for initial load
     await waitFor(() => {
@@ -213,7 +216,7 @@ describe("StorageContext", () => {
     });
 
     // Switch to localStorage
-    act(() => {
+    await act(async () => {
       screen.getByTestId("toggle-storage").click();
     });
 
@@ -228,22 +231,24 @@ describe("StorageContext", () => {
     // Set mock localStorage value
     window.localStorage.getItem = jest.fn().mockReturnValue("localStorage");
 
-    render(
-      <StorageProvider>
-        <TestComponent />
-      </StorageProvider>
-    );
-
-    // Verify storage type was set from localStorage
-    await waitFor(() => {
-      expect(screen.getByTestId("storage-type").textContent).toBe(
-        "localStorage"
+    await act(async () => {
+      render(
+        <StorageProvider>
+          <TestComponent />
+        </StorageProvider>
       );
     });
 
+    // Verify storage type was set from localStorage
+    expect(screen.getByTestId("storage-type").textContent).toBe("localStorage");
     expect(window.localStorage.getItem).toHaveBeenCalledWith(
       "preferred_storage"
     );
+
+    // Wait for history to load
+    await waitFor(() => {
+      expect(screen.getByTestId("history-length").textContent).toBe("2");
+    });
   });
 
   test("adds item to history", async () => {
@@ -282,11 +287,13 @@ describe("StorageContext", () => {
       updateResponseRating: jest.fn().mockResolvedValue(true),
     }));
 
-    render(
-      <StorageProvider>
-        <TestComponent />
-      </StorageProvider>
-    );
+    await act(async () => {
+      render(
+        <StorageProvider>
+          <TestComponent />
+        </StorageProvider>
+      );
+    });
 
     // Wait for initial history load
     await waitFor(() => {
@@ -294,23 +301,13 @@ describe("StorageContext", () => {
     });
 
     // Click the add button
-    act(() => {
+    await act(async () => {
       screen.getByTestId("add-button").click();
     });
 
-    // Verify provider methods were called
-    await waitFor(() => {
-      expect(addHistorySpy).toHaveBeenCalledWith(
-        "New query",
-        expect.any(Array)
-      );
-    });
-
-    // Verify UI updated
-    await waitFor(() => {
-      expect(screen.getByTestId("history-length").textContent).toBe("3");
-    });
-
+    // Verify provider methods were called and UI updated
+    expect(addHistorySpy).toHaveBeenCalledWith("New query", expect.any(Array));
+    expect(screen.getByTestId("history-length").textContent).toBe("3");
     expect(screen.getByTestId("first-query").textContent).toBe("New query");
   });
 
@@ -329,11 +326,13 @@ describe("StorageContext", () => {
       updateResponseRating: jest.fn().mockResolvedValue(true),
     }));
 
-    render(
-      <StorageProvider>
-        <TestComponent />
-      </StorageProvider>
-    );
+    await act(async () => {
+      render(
+        <StorageProvider>
+          <TestComponent />
+        </StorageProvider>
+      );
+    });
 
     // Wait for initial history load
     await waitFor(() => {
@@ -341,20 +340,13 @@ describe("StorageContext", () => {
     });
 
     // Click the delete button
-    act(() => {
+    await act(async () => {
       screen.getByTestId("delete-button").click();
     });
 
-    // Verify provider methods were called
-    await waitFor(() => {
-      expect(deleteHistorySpy).toHaveBeenCalledWith("123");
-    });
-
-    // Verify UI updated
-    await waitFor(() => {
-      expect(screen.getByTestId("history-length").textContent).toBe("1");
-    });
-
+    // Verify provider methods were called and UI updated
+    expect(deleteHistorySpy).toHaveBeenCalledWith("123");
+    expect(screen.getByTestId("history-length").textContent).toBe("1");
     expect(screen.getByTestId("first-query").textContent).toBe("Test query 2");
   });
 
@@ -384,11 +376,13 @@ describe("StorageContext", () => {
       updateResponseRating: updateRatingSpy,
     }));
 
-    render(
-      <StorageProvider>
-        <TestComponent />
-      </StorageProvider>
-    );
+    await act(async () => {
+      render(
+        <StorageProvider>
+          <TestComponent />
+        </StorageProvider>
+      );
+    });
 
     // Wait for initial history load
     await waitFor(() => {
@@ -396,23 +390,24 @@ describe("StorageContext", () => {
     });
 
     // Click the rate button
-    act(() => {
+    await act(async () => {
       screen.getByTestId("rate-button").click();
     });
 
-    // Verify provider methods were called
-    await waitFor(() => {
-      expect(updateRatingSpy).toHaveBeenCalledWith("123", 0, {
-        accuracy: true,
-        relevance: true,
-        completeness: true,
-        concise: true,
-        unbiased: true,
-      });
+    // Verify provider methods were called with correct parameters
+    expect(updateRatingSpy).toHaveBeenCalledWith("123", 0, {
+      accuracy: true,
+      relevance: true,
+      completeness: true,
+      concise: true,
+      unbiased: true,
     });
   });
 
   test("handles errors gracefully", async () => {
+    // Create a specific error to match against
+    const testError = new Error("Test error");
+
     // Spy on console.error
     const consoleErrorSpy = jest
       .spyOn(console, "error")
@@ -420,27 +415,75 @@ describe("StorageContext", () => {
 
     // Make the provider throw an error
     (PostgresStorageProvider as jest.Mock).mockImplementation(() => ({
-      getHistory: jest.fn().mockRejectedValue(new Error("Test error")),
+      getHistory: jest.fn().mockRejectedValue(testError),
       addHistory: jest.fn(),
       deleteHistory: jest.fn(),
       updateResponseRating: jest.fn(),
     }));
 
-    render(
-      <StorageProvider>
-        <TestComponent />
-      </StorageProvider>
-    );
-
-    // Verify error was logged
-    await waitFor(() => {
-      expect(consoleErrorSpy).toHaveBeenCalled();
+    await act(async () => {
+      render(
+        <StorageProvider>
+          <TestComponent />
+        </StorageProvider>
+      );
     });
+
+    // Verify error was logged correctly
+    // The context calls console.error directly with the error
+    expect(consoleErrorSpy).toHaveBeenCalledWith(testError);
 
     // History should be empty since error was thrown during load
     expect(screen.getByTestId("history-length").textContent).toBe("0");
 
     // Restore console.error
+    consoleErrorSpy.mockRestore();
+  });
+
+  test("handles error when adding to history", async () => {
+    // Create a specific error to match against
+    const addError = new Error("Add error");
+
+    // Spy on console.error
+    const consoleErrorSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
+    // Set up mock that will succeed for initial load but fail on add
+    const getHistorySpy = jest.fn().mockResolvedValue(mockHistoryData);
+    const addHistorySpy = jest.fn().mockRejectedValue(addError);
+
+    (PostgresStorageProvider as jest.Mock).mockImplementation(() => ({
+      getHistory: getHistorySpy,
+      addHistory: addHistorySpy,
+      deleteHistory: jest.fn(),
+      updateResponseRating: jest.fn(),
+    }));
+
+    await act(async () => {
+      render(
+        <StorageProvider>
+          <TestComponent />
+        </StorageProvider>
+      );
+    });
+
+    // Wait for initial history load
+    await waitFor(() => {
+      expect(screen.getByTestId("history-length").textContent).toBe("2");
+    });
+
+    // Try to add an item which will cause an error
+    await act(async () => {
+      screen.getByTestId("add-button").click();
+    });
+
+    // Verify the error was logged via the component's error handler
+    expect(consoleErrorSpy).toHaveBeenCalledWith(addError);
+
+    // History should remain unchanged
+    expect(screen.getByTestId("history-length").textContent).toBe("2");
+
     consoleErrorSpy.mockRestore();
   });
 
