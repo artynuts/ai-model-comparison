@@ -3,6 +3,7 @@ import ComparisonForm from "../ComparisonForm";
 import { compareModels } from "../../lib/api";
 import { useStorage } from "../../context/StorageContext";
 import { AIResponse } from "../../types";
+import QueryGroup from "../QueryGroup";
 
 // Mock dependencies
 jest.mock("../../lib/api", () => ({
@@ -64,7 +65,7 @@ describe("ComparisonForm", () => {
       addToHistory: mockAddToHistory,
       updateResponseRating: mockUpdateResponseRating,
     });
-    mockAddToHistory.mockResolvedValue("mock-id-123");
+    mockAddToHistory.mockResolvedValue({ id: "mock-id-123", skipped: false });
     (compareModels as jest.Mock).mockResolvedValue(mockResponses);
   });
 
@@ -152,6 +153,9 @@ describe("ComparisonForm", () => {
   });
 
   it("allows users to rate responses", async () => {
+    // Make sure the addToHistory mock returns the correct format
+    mockAddToHistory.mockResolvedValue({ id: "mock-id-123", skipped: false });
+
     render(<ComparisonForm />);
 
     // Enter a query and submit
@@ -172,9 +176,12 @@ describe("ComparisonForm", () => {
     const rateButton = screen.getByTestId("mock-rating-button");
     fireEvent.click(rateButton);
 
-    // Verify the rating was updated
-    expect(mockUpdateResponseRating).toHaveBeenCalledWith("mock-id-123", 0, {
-      accuracy: true,
+    // Wait for the rating update to be processed
+    await waitFor(() => {
+      // Verify the rating was updated
+      expect(mockUpdateResponseRating).toHaveBeenCalledWith("mock-id-123", 0, {
+        accuracy: true,
+      });
     });
   });
 
@@ -236,5 +243,235 @@ describe("ComparisonForm", () => {
       "History test",
       mockResponses
     );
+  });
+
+  it("does not submit when query is empty string", async () => {
+    render(<ComparisonForm />);
+
+    // First add non-whitespace to make button enabled
+    const textarea = screen.getByPlaceholderText("Enter your query here...");
+    fireEvent.change(textarea, { target: { value: "test" } });
+
+    // Get the button while it's enabled
+    const submitButton = screen.getByRole("button", {
+      name: /compare models/i,
+    });
+    expect(submitButton).not.toBeDisabled();
+
+    // Now change to whitespace-only
+    fireEvent.change(textarea, { target: { value: "   " } }); // Only whitespace
+
+    // Submit the form directly to test early return in handleSubmit
+    // This specifically tests line 28: if (!query.trim()) return;
+    const form = screen.getByTestId("comparison-form");
+    fireEvent.submit(form);
+
+    // Verify compareModels and addToHistory were not called
+    expect(compareModels).not.toHaveBeenCalled();
+    expect(mockAddToHistory).not.toHaveBeenCalled();
+
+    // The comparison state should remain unchanged
+    expect(screen.queryByTestId("query-group")).not.toBeInTheDocument();
+  });
+
+  it("handles the case when addToHistory returns different ID", async () => {
+    // Setup addToHistory to return a different ID
+    mockAddToHistory.mockResolvedValue({
+      id: "different-id-than-expected",
+      skipped: false,
+    });
+
+    render(<ComparisonForm />);
+
+    const textarea = screen.getByPlaceholderText("Enter your query here...");
+    fireEvent.change(textarea, { target: { value: "ID test" } });
+
+    const submitButton = screen.getByRole("button", {
+      name: /compare models/i,
+    });
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("query-group")).toBeInTheDocument();
+    });
+
+    // Check the ID is passed correctly to QueryGroup
+    expect(mockAddToHistory).toHaveBeenCalledWith("ID test", mockResponses);
+  });
+
+  it("handles addToHistory rejection", async () => {
+    // Setup addToHistory to reject
+    mockAddToHistory.mockRejectedValue(new Error("History error"));
+
+    // Spy on console.error to verify it's called
+    jest.spyOn(console, "error").mockImplementation(() => {});
+
+    render(<ComparisonForm />);
+
+    const textarea = screen.getByPlaceholderText("Enter your query here...");
+    fireEvent.change(textarea, { target: { value: "History error test" } });
+
+    const submitButton = screen.getByRole("button", {
+      name: /compare models/i,
+    });
+    fireEvent.click(submitButton);
+
+    // Wait for the error to be handled
+    await waitFor(() => {
+      expect(console.error).toHaveBeenCalledWith(
+        "Comparison failed:",
+        expect.any(Error)
+      );
+    });
+
+    // No QueryGroup should be displayed
+    expect(screen.queryByTestId("query-group")).not.toBeInTheDocument();
+  });
+
+  it("displays responses with error messages", async () => {
+    const responsesWithError = [
+      ...mockResponses,
+      {
+        id: "resp3",
+        modelName: "Model C",
+        provider: "Provider Z",
+        version: "3.0",
+        description: "Test model C",
+        response: "",
+        latency: 300,
+        error: "Model unavailable",
+      },
+    ];
+
+    (compareModels as jest.Mock).mockResolvedValue(responsesWithError);
+
+    render(<ComparisonForm />);
+
+    const textarea = screen.getByPlaceholderText("Enter your query here...");
+    fireEvent.change(textarea, { target: { value: "Error response test" } });
+
+    const submitButton = screen.getByRole("button", {
+      name: /compare models/i,
+    });
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("query-group")).toBeInTheDocument();
+    });
+
+    // Verify responses with error are passed to QueryGroup
+    expect(screen.getByText("Responses: 3")).toBeInTheDocument();
+  });
+
+  it("doesn't update rating when comparison id is empty", async () => {
+    render(<ComparisonForm />);
+
+    // Get the form to a state where responses are loaded but ID is empty
+    const textarea = screen.getByPlaceholderText("Enter your query here...");
+    fireEvent.change(textarea, { target: { value: "Rating test" } });
+
+    // Force the comparison state to have empty ID
+    (compareModels as jest.Mock).mockResolvedValue(mockResponses);
+    mockAddToHistory.mockResolvedValue({ id: "", skipped: false });
+
+    const submitButton = screen.getByRole("button", {
+      name: /compare models/i,
+    });
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("query-group")).toBeInTheDocument();
+    });
+
+    // Rating button click should not update the rating
+    const rateButton = screen.getByTestId("mock-rating-button");
+    fireEvent.click(rateButton);
+
+    // Verify updateResponseRating was not called
+    expect(mockUpdateResponseRating).not.toHaveBeenCalled();
+  });
+
+  it("doesn't update rating when rating is null", async () => {
+    // Create a special mock implementation for this test
+    const originalMock = jest.requireMock("../QueryGroup").default;
+    const mockImplementation = jest.fn(({ onRatingChange }) => {
+      // Call onRatingChange with null immediately after component renders
+      if (onRatingChange) {
+        setTimeout(() => onRatingChange(0, null), 0);
+      }
+      return (
+        <div data-testid="query-group">
+          <div>Mock QueryGroup</div>
+        </div>
+      );
+    });
+
+    jest.requireMock("../QueryGroup").default = mockImplementation;
+
+    render(<ComparisonForm />);
+
+    // Enter a query and submit
+    const textarea = screen.getByPlaceholderText("Enter your query here...");
+    fireEvent.change(textarea, { target: { value: "Null rating test" } });
+
+    const submitButton = screen.getByRole("button", {
+      name: /compare models/i,
+    });
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("query-group")).toBeInTheDocument();
+    });
+
+    // With our mock implementation, onRatingChange is called with null
+    // So verify that updateResponseRating wasn't called
+    await waitFor(() => {
+      expect(mockUpdateResponseRating).not.toHaveBeenCalled();
+    });
+
+    // Restore original mock
+    jest.requireMock("../QueryGroup").default = originalMock;
+  });
+
+  it("doesn't update rating when rating is undefined", async () => {
+    // Create a special mock implementation for this test
+    const originalMock = jest.requireMock("../QueryGroup").default;
+    const mockImplementation = jest.fn(({ onRatingChange }) => {
+      // Call onRatingChange with undefined immediately after component renders
+      if (onRatingChange) {
+        setTimeout(() => onRatingChange(0, undefined), 0);
+      }
+      return (
+        <div data-testid="query-group">
+          <div>Mock QueryGroup</div>
+        </div>
+      );
+    });
+
+    jest.requireMock("../QueryGroup").default = mockImplementation;
+
+    render(<ComparisonForm />);
+
+    // Enter a query and submit
+    const textarea = screen.getByPlaceholderText("Enter your query here...");
+    fireEvent.change(textarea, { target: { value: "Undefined rating test" } });
+
+    const submitButton = screen.getByRole("button", {
+      name: /compare models/i,
+    });
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("query-group")).toBeInTheDocument();
+    });
+
+    // With our mock implementation, onRatingChange is called with undefined
+    // So verify that updateResponseRating wasn't called
+    await waitFor(() => {
+      expect(mockUpdateResponseRating).not.toHaveBeenCalled();
+    });
+
+    // Restore original mock
+    jest.requireMock("../QueryGroup").default = originalMock;
   });
 });

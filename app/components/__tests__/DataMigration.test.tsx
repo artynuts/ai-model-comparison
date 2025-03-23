@@ -297,4 +297,117 @@ describe("DataMigration", () => {
     // We mocked "local query 1" to be skipped
     expect(screen.getByText(/\"local query 1\"/)).toBeInTheDocument();
   });
+
+  it("handles errors during migration from PostgreSQL", async () => {
+    // Mock console.error to prevent actual console output in tests
+    jest.spyOn(console, "error").mockImplementation(() => {});
+
+    // Set up for PostgreSQL migration
+    (useStorage as jest.Mock).mockReturnValue({
+      storageType: "postgres",
+    });
+
+    // Setup PostgresStorageProvider to throw an error
+    mockPgGetHistory.mockRejectedValueOnce(new Error("Postgres test error"));
+
+    render(<DataMigration />);
+
+    const migrateButton = screen.getByRole("button", {
+      name: /Migrate to localStorage/i,
+    });
+    fireEvent.click(migrateButton);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("Migration failed. Please try again.")
+      ).toBeInTheDocument();
+    });
+
+    // Button should be enabled again
+    expect(screen.getByRole("button")).toBeEnabled();
+    expect(
+      screen.getByRole("button", { name: /Migrate to localStorage/i })
+    ).toBeInTheDocument();
+
+    // Verify error was logged
+    expect(console.error).toHaveBeenCalledWith(
+      "Migration failed:",
+      expect.any(Error)
+    );
+  });
+
+  it("handles errors during the actual migration process from localStorage to PostgreSQL", async () => {
+    // Mock console.error to prevent actual console output in tests
+    jest.spyOn(console, "error").mockImplementation(() => {});
+
+    // Setup successful getHistory, but addHistory will fail
+    mockLocalGetHistory.mockResolvedValueOnce([
+      { id: "1", query: "local query 1", responses: [], timestamp: 1000 },
+      { id: "2", query: "local query 2", responses: [], timestamp: 2000 },
+    ]);
+    mockPgAddHistory.mockRejectedValueOnce(new Error("Database write error"));
+
+    render(<DataMigration />);
+
+    const migrateButton = screen.getByRole("button", {
+      name: /Migrate to PostgreSQL/i,
+    });
+    fireEvent.click(migrateButton);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("Migration failed. Please try again.")
+      ).toBeInTheDocument();
+    });
+
+    // Button should be enabled again
+    expect(screen.getByRole("button")).toBeEnabled();
+
+    // Verify error was logged
+    expect(console.error).toHaveBeenCalledWith(
+      "Migration failed:",
+      expect.any(Error)
+    );
+  });
+
+  it("handles errors during the actual migration process from PostgreSQL to localStorage", async () => {
+    // Mock console.error to prevent actual console output in tests
+    jest.spyOn(console, "error").mockImplementation(() => {});
+
+    // Set up for PostgreSQL migration
+    (useStorage as jest.Mock).mockReturnValue({
+      storageType: "postgres",
+    });
+
+    // Setup successful getHistory, but addHistory will fail
+    mockPgGetHistory.mockResolvedValueOnce([
+      { id: "3", query: "pg query 1", responses: [], timestamp: 3000 },
+      { id: "4", query: "pg query 2", responses: [], timestamp: 4000 },
+    ]);
+    mockLocalAddHistory.mockRejectedValueOnce(
+      new Error("LocalStorage write error")
+    );
+
+    render(<DataMigration />);
+
+    const migrateButton = screen.getByRole("button", {
+      name: /Migrate to localStorage/i,
+    });
+    fireEvent.click(migrateButton);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("Migration failed. Please try again.")
+      ).toBeInTheDocument();
+    });
+
+    // Button should be enabled again
+    expect(screen.getByRole("button")).toBeEnabled();
+
+    // Verify error was logged with correct error message
+    expect(console.error).toHaveBeenCalledWith(
+      "Migration failed:",
+      expect.any(Error)
+    );
+  });
 });

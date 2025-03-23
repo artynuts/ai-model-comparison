@@ -199,4 +199,38 @@ describe("DataDeletion", () => {
       expect.any(Error)
     );
   });
+
+  it("shows error message when PostgreSQL deletion returns non-OK response", async () => {
+    // Simulate an unsuccessful response
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: false,
+      json: () => Promise.resolve({ error: "Database error" }),
+    });
+
+    (useStorage as jest.Mock).mockReturnValue({
+      storageType: "postgres",
+    });
+    (getStorageDisplayName as jest.Mock).mockReturnValue("PostgreSQL Database");
+
+    // Spy on console.error
+    jest.spyOn(console, "error").mockImplementation(() => {});
+
+    render(<DataDeletion />);
+
+    const deleteButton = screen.getByRole("button", {
+      name: /Delete All PostgreSQL Database Data/,
+    });
+    fireEvent.click(deleteButton);
+
+    // Wait for the error to be handled
+    await waitFor(() => {
+      expect(screen.getByText(/Failed to delete data/)).toBeInTheDocument();
+    });
+
+    // Console error should be called with the specific error message
+    expect(console.error).toHaveBeenCalledWith(
+      "Data deletion failed:",
+      new Error("Failed to delete data from PostgreSQL")
+    );
+  });
 });

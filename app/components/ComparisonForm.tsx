@@ -32,8 +32,8 @@ export default function ComparisonForm() {
     try {
       const responses = await compareModels(query);
       const timestamp = Date.now();
-      const id = await addToHistory(query, responses);
-      setComparison({ isLoading: false, responses, timestamp, id });
+      const result = await addToHistory(query, responses);
+      setComparison({ isLoading: false, responses, timestamp, id: result.id });
     } catch (error) {
       console.error("Comparison failed:", error);
       setComparison({
@@ -63,7 +63,11 @@ export default function ComparisonForm() {
 
   return (
     <div className="w-full max-w-6xl">
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-4"
+        data-testid="comparison-form"
+      >
         <div>
           <textarea
             value={query}
