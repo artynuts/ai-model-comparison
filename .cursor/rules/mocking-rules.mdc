@@ -1,5 +1,0 @@
----
-description: Best practices for mocking in tests
-globs: *.test.tsx
-alwaysApply: false
----
