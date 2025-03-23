@@ -400,14 +400,14 @@ describe("DataValidation", () => {
   });
 
   it("properly shows validation results with item details", async () => {
-    // Mock data with all types of issues
+    // Mock data with all types of issues except order issues
     const mockData: (Partial<HistoryItem> & {
       responses: Partial<AIResponse>[];
     })[] = [
       {
         id: "",
         query: "  query1  ",
-        timestamp: 3000,
+        timestamp: 1000, // Oldest first (correct order when reversed)
         responses: [
           {
             id: "",
@@ -423,7 +423,7 @@ describe("DataValidation", () => {
       {
         id: "id2",
         query: "  query2  ",
-        timestamp: 2000,
+        timestamp: 2000, // Middle
         responses: [
           {
             id: "resp-id",
@@ -439,7 +439,7 @@ describe("DataValidation", () => {
       {
         id: "id3",
         query: "query3",
-        timestamp: 1000,
+        timestamp: 3000, // Newest last (correct order when reversed)
         responses: [
           {
             id: "",
@@ -484,13 +484,120 @@ describe("DataValidation", () => {
     ).toBeInTheDocument();
     expect(screen.getByText(/Queries trimmed: 2/i)).toBeInTheDocument();
 
-    // Check for order fixed notification if applicable
-    // Note: We're using queryByText since some test runs might not have this
-    const orderFixedElement = screen.queryByText(
-      /Fixed incorrect timestamp ordering/i
+    // Verify that order fixing notice is NOT present since our data was in correct chronological order
+    expect(
+      screen.queryByText(/Fixed incorrect timestamp ordering/i)
+    ).not.toBeInTheDocument();
+
+    // Verify localStorage was updated with fixed data
+    expect(localStorageMock.setItem).toHaveBeenCalledWith(
+      "queryHistory",
+      expect.any(String)
     );
-    if (orderFixedElement) {
-      expect(orderFixedElement).toBeInTheDocument();
-    }
+
+    // Get the JSON string that was passed to localStorage.setItem
+    const setItemArgs = localStorageMock.setItem.mock.calls[0];
+    const fixedData = JSON.parse(setItemArgs[1]);
+
+    // Items should be sorted newest first (reverse of our input)
+    expect(fixedData[0].timestamp).toBe(3000);
+    expect(fixedData[1].timestamp).toBe(2000);
+    expect(fixedData[2].timestamp).toBe(1000);
+  });
+
+  it("detects and fixes incorrect timestamp ordering", async () => {
+    // Mock data with incorrect timestamp order (not in descending order)
+    const mockData: (Partial<HistoryItem> & {
+      responses: Partial<AIResponse>[];
+    })[] = [
+      {
+        id: "id1",
+        query: "query1",
+        timestamp: 1000, // Oldest item first
+        responses: [
+          {
+            id: "resp-1",
+            modelName: "model1",
+            provider: "provider1",
+            version: "1.0",
+            description: "",
+            response: "",
+            latency: 0,
+          },
+        ],
+      },
+      {
+        id: "id2",
+        query: "query2",
+        timestamp: 3000, // Newest item in middle (incorrect order)
+        responses: [
+          {
+            id: "resp-2",
+            modelName: "model2",
+            provider: "provider2",
+            version: "2.0",
+            description: "",
+            response: "",
+            latency: 0,
+          },
+        ],
+      },
+      {
+        id: "id3",
+        query: "query3",
+        timestamp: 2000, // Middle timestamp at end (incorrect order)
+        responses: [
+          {
+            id: "resp-3",
+            modelName: "model3",
+            provider: "provider3",
+            version: "3.0",
+            description: "",
+            response: "",
+            latency: 0,
+          },
+        ],
+      },
+    ];
+
+    mockLocalGetHistory.mockResolvedValue(mockData as HistoryItem[]);
+
+    render(<DataValidation />);
+
+    const validateButton = screen.getByRole("button", {
+      name: /Fix Local Storage Data/i,
+    });
+    fireEvent.click(validateButton);
+
+    // Wait for validation to complete
+    await waitFor(() => {
+      expect(
+        screen.getByText(/Fixed \d+ items with issues/i)
+      ).toBeInTheDocument();
+    });
+
+    // Expand the details section
+    const detailsButton = screen.getByText("Show Details");
+    fireEvent.click(detailsButton);
+
+    // Verify that the order fixed notification IS present
+    expect(
+      screen.getByText(/Fixed incorrect timestamp ordering/i)
+    ).toBeInTheDocument();
+
+    // Verify localStorage was updated with reordered data
+    expect(localStorageMock.setItem).toHaveBeenCalledWith(
+      "queryHistory",
+      expect.any(String)
+    );
+
+    // Get the JSON string that was passed to localStorage.setItem
+    const setItemArgs = localStorageMock.setItem.mock.calls[0];
+    const fixedData = JSON.parse(setItemArgs[1]);
+
+    // Verify items are now sorted by timestamp in descending order (newest first)
+    expect(fixedData[0].timestamp).toBe(3000);
+    expect(fixedData[1].timestamp).toBe(2000);
+    expect(fixedData[2].timestamp).toBe(1000);
   });
 });
