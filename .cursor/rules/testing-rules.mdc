@@ -29,5 +29,8 @@ alwaysApply: false
 - **Each test should validate a specific user-visible expectation** or interaction pattern.
 - **Tests should remain valid even if internal implementation changes** - they should test what the code does, not how it does it.
 
+# React Testing best practices
+- **Follow the React testing best practices for async operations** with proper act and await usage
+
 # Ignored
 # **Prefer integration-style tests** that demonstrate components working together when appropriate.
