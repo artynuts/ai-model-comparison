@@ -1,7 +1,7 @@
 import React from "react";
 import { render } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import RootLayout from "../layout";
+import RootLayout, { metadata, viewport } from "../layout";
 
 // Mock the Logo component
 jest.mock("../components/Logo", () => {
@@ -122,5 +122,34 @@ describe("RootLayout", () => {
     // Check that the layout component returns an html element with lang="en"
     expect(layout.type).toBe("html");
     expect(layout.props.lang).toBe("en");
+  });
+});
+
+describe("Metadata", () => {
+  it("has the correct title and description", () => {
+    expect(metadata.title).toBe("AI Model Comparison");
+    expect(metadata.description).toBe(
+      "Compare responses from different AI models"
+    );
+  });
+
+  it("defines the correct icon", () => {
+    // Using type assertion to handle Next.js Metadata types
+    expect(metadata.icons).toBeDefined();
+    const icons = metadata.icons as { icon: { url: string; type: string } };
+    expect(icons.icon).toEqual({
+      url: "/icons/icon.svg",
+      type: "image/svg+xml",
+    });
+  });
+
+  it("includes a manifest reference", () => {
+    expect(metadata.manifest).toBe("/manifest.json");
+  });
+});
+
+describe("Viewport", () => {
+  it("defines the correct theme color", () => {
+    expect(viewport.themeColor).toBe("#4F46E5");
   });
 });
