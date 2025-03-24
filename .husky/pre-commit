@@ -1,3 +1,4 @@
+#!/bin/sh
 echo "Running tests and checking coverage before commit..."
 npm run test:coverage
 node scripts/check-coverage.js
