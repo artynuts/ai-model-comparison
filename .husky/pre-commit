@@ -1,0 +1,38 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "Running tests and checking coverage before commit..."
+
+# Run jest with coverage
+npm run test:coverage
+
+# Check if coverage is 100%
+node -e "
+  const fs = require('fs');
+  try {
+    const coverage = JSON.parse(fs.readFileSync('./coverage/coverage-summary.json', 'utf8'));
+    const total = coverage.total;
+    
+    console.log('COVERAGE REPORT:');
+    console.log(\`Statements: \${total.statements.pct}%\`);
+    console.log(\`Branches: \${total.branches.pct}%\`);
+    console.log(\`Functions: \${total.functions.pct}%\`);
+    console.log(\`Lines: \${total.lines.pct}%\`);
+    
+    if (
+      total.statements.pct < 100 ||
+      total.branches.pct < 100 ||
+      total.functions.pct < 100 ||
+      total.lines.pct < 100
+    ) {
+      console.error('❌ Error: Code coverage is not 100%');
+      console.error('Please ensure all code is covered by tests before committing.');
+      process.exit(1);
+    } else {
+      console.log('✅ Code coverage is 100%');
+    }
+  } catch (error) {
+    console.error('Error reading coverage report:', error.message);
+    process.exit(1);
+  }
+" 

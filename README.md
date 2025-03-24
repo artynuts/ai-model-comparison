@@ -325,6 +325,41 @@ The application provides functionality to migrate data between PostgreSQL and lo
 
 Note: When migrating large datasets, the process may take a few moments. The application will show a progress indicator during migration.
 
+## Development
+
+### Testing and Code Coverage
+
+This project enforces 100% test coverage for all code. This ensures high code quality and reliability.
+
+#### Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run tests with coverage report
+npm run test:coverage
+
+# Check if coverage meets 100% threshold
+npm run check-coverage
+```
+
+#### Coverage Requirements
+
+- All new code must have 100% test coverage for:
+  - Statements
+  - Branches
+  - Functions
+  - Lines
+
+#### Pre-commit Hooks
+
+The project uses Husky to enforce test coverage requirements:
+
+- Pre-commit hook automatically runs tests and checks coverage
+- Commits will be blocked if coverage is below 100%
+- The hook will show which files need additional test coverage
+
 ## Contributing
 
 1. Fork the repository
