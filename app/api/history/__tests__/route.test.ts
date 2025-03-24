@@ -14,6 +14,9 @@ jest.mock("next/server", () => ({
   },
 }));
 
+// Mock console.error to prevent actual logging during tests
+jest.spyOn(console, "error").mockImplementation(() => {});
+
 // Define interface for the response object
 interface ResponseItem {
   text: string;

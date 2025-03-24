@@ -14,6 +14,9 @@ jest.mock("next/server", () => ({
   },
 }));
 
+// Mock console.error to prevent actual logging during tests
+jest.spyOn(console, "error").mockImplementation(() => {});
+
 describe("History All API Route", () => {
   beforeEach(() => {
     jest.clearAllMocks();

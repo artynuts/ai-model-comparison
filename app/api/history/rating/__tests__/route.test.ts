@@ -1,6 +1,16 @@
 import { NextResponse } from "next/server";
 import { PUT } from "../route";
-import { prisma } from "@/lib/db";
+import * as db from "@/lib/db";
+
+// Define the shape of our mock db object with prisma
+type MockDB = {
+  prisma: {
+    queryHistory: {
+      findFirst: jest.Mock;
+      updateMany: jest.Mock;
+    };
+  };
+};
 
 // Mock prisma
 jest.mock("@/lib/db", () => ({
@@ -18,6 +28,9 @@ jest.mock("next/server", () => ({
     json: jest.fn((data, options) => ({ data, options })),
   },
 }));
+
+// Mock console.error to prevent actual logging during tests
+jest.spyOn(console, "error").mockImplementation(() => {});
 
 describe("History Rating API Route", () => {
   beforeEach(() => {
@@ -43,21 +56,23 @@ describe("History Rating API Route", () => {
       };
 
       // Mock prisma findFirst result
-      (prisma.queryHistory.findFirst as jest.Mock).mockResolvedValueOnce(
-        mockHistoryItem
-      );
+      (
+        db as unknown as MockDB
+      ).prisma.queryHistory.findFirst.mockResolvedValueOnce(mockHistoryItem);
 
       // Mock prisma updateMany result
       const mockUpdateResult = { count: 1 };
-      (prisma.queryHistory.updateMany as jest.Mock).mockResolvedValueOnce(
-        mockUpdateResult
-      );
+      (
+        db as unknown as MockDB
+      ).prisma.queryHistory.updateMany.mockResolvedValueOnce(mockUpdateResult);
 
       // Call the PUT function
       const response = await PUT(mockRequest as unknown as Request);
 
       // Check if prisma.queryHistory.findFirst was called with correct arguments
-      expect(prisma.queryHistory.findFirst).toHaveBeenCalledWith({
+      expect(
+        (db as unknown as MockDB).prisma.queryHistory.findFirst
+      ).toHaveBeenCalledWith({
         where: {
           timestamp: BigInt(123456789),
         },
@@ -73,7 +88,9 @@ describe("History Rating API Route", () => {
       ];
 
       // Check if prisma.queryHistory.updateMany was called with correct arguments
-      expect(prisma.queryHistory.updateMany).toHaveBeenCalledWith({
+      expect(
+        (db as unknown as MockDB).prisma.queryHistory.updateMany
+      ).toHaveBeenCalledWith({
         where: {
           timestamp: BigInt(123456789),
         },
@@ -97,7 +114,9 @@ describe("History Rating API Route", () => {
       };
 
       // Mock prisma findFirst result (no item found)
-      (prisma.queryHistory.findFirst as jest.Mock).mockResolvedValueOnce(null);
+      (
+        db as unknown as MockDB
+      ).prisma.queryHistory.findFirst.mockResolvedValueOnce(null);
 
       // Call the PUT function
       const response = await PUT(mockRequest as unknown as Request);
@@ -121,7 +140,9 @@ describe("History Rating API Route", () => {
 
       // Mock prisma findFirst to throw error
       const error = new Error("Database error");
-      (prisma.queryHistory.findFirst as jest.Mock).mockRejectedValueOnce(error);
+      (
+        db as unknown as MockDB
+      ).prisma.queryHistory.findFirst.mockRejectedValueOnce(error);
 
       // Call the PUT function
       const response = await PUT(mockRequest as unknown as Request);
