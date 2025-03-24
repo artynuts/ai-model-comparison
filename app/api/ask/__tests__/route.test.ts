@@ -464,5 +464,42 @@ describe("Ask API Route", () => {
       // We can still assert that coverage was increased for line 100
       // The real goal here is to cover the code, not validate a specific behavior
     });
+
+    it("handles non-text content from Claude", async () => {
+      // Mock a request object with Claude model
+      const mockRequest = {
+        json: jest.fn().mockResolvedValueOnce({
+          model: "Claude",
+          query: "test query",
+        }),
+      };
+
+      // Set up Claude mock to return non-text content
+      anthropicMock.messages.create.mockResolvedValueOnce({
+        content: [
+          {
+            type: "image",
+            text: null,
+            image_url: "http://example.com/image.jpg",
+          },
+        ],
+      });
+
+      // Execute the request
+      await POST(mockRequest as unknown as Request);
+
+      // Verify Claude was called
+      expect(anthropicMock.messages.create).toHaveBeenCalled();
+
+      // Verify that the response is empty string when content type is not text
+      expect(NextResponse.json).toHaveBeenCalledWith({
+        response: "",
+        id: "Claude",
+        name: "Claude 3 Opus",
+        provider: "Anthropic",
+        version: "claude-3-opus-20240229",
+        description: "Latest Claude model",
+      });
+    });
   });
 });
