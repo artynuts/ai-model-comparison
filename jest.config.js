@@ -21,7 +21,6 @@ const customJestConfig = {
     "app/**/*.{js,jsx,ts,tsx}",
     "!app/**/_*.{js,jsx,ts,tsx}",
     "!app/**/*.d.ts",
-    "!app/api/**",
     "!**/node_modules/**",
     "!**/__tests__/**",
   ],
