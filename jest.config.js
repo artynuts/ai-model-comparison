@@ -14,6 +14,8 @@ const customJestConfig = {
     "^@/(.*)$": "<rootDir>/$1",
   },
   testMatch: ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],
+  // Explicitly exclude Playwright e2e test directory
+  testPathIgnorePatterns: ["/node_modules/", "/e2e/"],
   // Coverage configuration
   collectCoverage: true,
   coverageDirectory: "coverage",
@@ -23,6 +25,7 @@ const customJestConfig = {
     "!app/**/*.d.ts",
     "!**/node_modules/**",
     "!**/__tests__/**",
+    "!e2e/**", // Exclude e2e tests from coverage calculations
   ],
   coverageReporters: ["json", "lcov", "text", "clover", "html", "json-summary"],
   // Add coverage threshold enforcement
