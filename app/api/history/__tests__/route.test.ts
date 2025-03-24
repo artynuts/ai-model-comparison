@@ -14,6 +14,13 @@ jest.mock("next/server", () => ({
   },
 }));
 
+// Define interface for the response object
+interface ResponseItem {
+  text: string;
+  modelName: string;
+  rating?: { accuracy: number } | undefined;
+}
+
 describe("History API Routes", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -120,6 +127,90 @@ describe("History API Routes", () => {
         { status: 500 }
       );
     });
+
+    it("handles creating a history item successfully", async () => {
+      const mockRequest = {
+        json: jest.fn().mockResolvedValueOnce({
+          id: "test-id",
+          query: "test query",
+          timestamp: 1234567890,
+          responses: [{ text: "response" }],
+        }),
+      };
+
+      (db.executeQuery as jest.Mock).mockResolvedValueOnce([
+        {
+          id: "test-id",
+          query: "test query",
+          timestamp: 1234567890,
+          responses: [{ text: "response" }],
+        },
+      ]);
+
+      const response = await POST(mockRequest as unknown as Request);
+
+      expect(db.executeQuery).toHaveBeenCalledWith(
+        'INSERT INTO "QueryHistory" (id, query, timestamp, responses) VALUES ($1, $2, $3, $4::jsonb) ON CONFLICT (id) DO UPDATE SET query = EXCLUDED.query, timestamp = EXCLUDED.timestamp, responses = EXCLUDED.responses, "updatedAt" = NOW() RETURNING *',
+        [
+          "test-id",
+          "test query",
+          1234567890,
+          JSON.stringify([{ text: "response" }]),
+        ]
+      );
+
+      expect(NextResponse.json).toHaveBeenCalledWith({
+        id: "test-id",
+        query: "test query",
+        timestamp: 1234567890,
+        responses: [{ text: "response" }],
+      });
+    });
+
+    it("handles creating a history item when no rows are returned", async () => {
+      const mockRequest = {
+        json: jest.fn().mockResolvedValueOnce({
+          id: "test-id",
+          query: "test query",
+          timestamp: 1234567890,
+          responses: [{ text: "response" }],
+        }),
+      };
+
+      // Mock empty result array
+      (db.executeQuery as jest.Mock).mockResolvedValueOnce([]);
+
+      const response = await POST(mockRequest as unknown as Request);
+
+      expect(db.executeQuery).toHaveBeenCalledWith(
+        'INSERT INTO "QueryHistory" (id, query, timestamp, responses) VALUES ($1, $2, $3, $4::jsonb) ON CONFLICT (id) DO UPDATE SET query = EXCLUDED.query, timestamp = EXCLUDED.timestamp, responses = EXCLUDED.responses, "updatedAt" = NOW() RETURNING *',
+        [
+          "test-id",
+          "test query",
+          1234567890,
+          JSON.stringify([{ text: "response" }]),
+        ]
+      );
+
+      expect(NextResponse.json).toHaveBeenCalledWith({ skipped: true });
+    });
+
+    it("handles missing ID in POST request", async () => {
+      const mockRequest = {
+        json: jest.fn().mockResolvedValueOnce({
+          query: "test query",
+          timestamp: 123456,
+          responses: [],
+        }),
+      };
+
+      const response = await POST(mockRequest as unknown as Request);
+
+      expect(NextResponse.json).toHaveBeenCalledWith(
+        { error: "ID is required" },
+        { status: 400 }
+      );
+    });
   });
 
   describe("DELETE", () => {
@@ -200,8 +291,11 @@ describe("History API Routes", () => {
       );
 
       // Second query to update the rating
-      const updatedResponses = [...mockResponses];
-      updatedResponses[0].rating = { accuracy: 5 };
+      const updatedResponses = [...mockResponses] as ResponseItem[];
+      updatedResponses[0] = {
+        ...updatedResponses[0],
+        rating: { accuracy: 5 },
+      };
 
       expect(db.executeQuery).toHaveBeenNthCalledWith(
         2,
@@ -270,6 +364,63 @@ describe("History API Routes", () => {
         { error: "Failed to update rating" },
         { status: 500 }
       );
+    });
+
+    it("handles updating rating successfully", async () => {
+      // Setup mock request
+      const mockRequest = {
+        json: jest.fn().mockResolvedValueOnce({
+          id: "test-id",
+          responseIndex: 0,
+          rating: { accuracy: 5 },
+        }),
+      };
+
+      // Type-safe response array with correct interface
+      const mockResponses: Array<{
+        text: string;
+        modelName: string;
+        rating?: any;
+      }> = [
+        {
+          text: "response",
+          modelName: "test-model",
+        },
+      ];
+
+      // Mock the database response
+      (db.executeQuery as jest.Mock).mockResolvedValueOnce([
+        { responses: mockResponses },
+      ]);
+
+      // Call the PUT function
+      await PUT(mockRequest as unknown as Request);
+
+      // Verify the first query
+      expect(db.executeQuery).toHaveBeenNthCalledWith(
+        1,
+        'SELECT responses FROM "QueryHistory" WHERE id = $1',
+        ["test-id"]
+      );
+
+      // Create the expected updated responses array
+      const expectedUpdatedResponses = [
+        {
+          text: "response",
+          modelName: "test-model",
+          rating: { accuracy: 5 },
+        },
+      ];
+
+      // Verify the second query
+      expect(db.executeQuery).toHaveBeenNthCalledWith(
+        2,
+        'UPDATE "QueryHistory" SET responses = $1::jsonb, "updatedAt" = NOW() WHERE id = $2',
+        [JSON.stringify(expectedUpdatedResponses), "test-id"]
+      );
+
+      // Verify the response
+      expect(NextResponse.json).toHaveBeenCalledWith({ success: true });
     });
   });
 });
