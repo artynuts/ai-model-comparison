@@ -3,7 +3,7 @@ import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const MODELS = {
+export const MODELS = {
   "GPT-4": {
     id: "GPT-4",
     name: "GPT-4",

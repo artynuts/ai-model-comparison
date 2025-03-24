@@ -1,8 +1,17 @@
 import { NextResponse } from "next/server";
-import { POST } from "../route";
+import { POST, MODELS } from "../route";
 import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+
+// Add interface for model type
+interface ModelInfo {
+  id: string;
+  name: string;
+  provider: string;
+  version: string;
+  description: string;
+}
 
 // Mock the AI service libraries
 jest.mock("openai", () => {
@@ -41,7 +50,7 @@ jest.mock("@google/generative-ai", () => {
 // Mock NextResponse
 jest.mock("next/server", () => ({
   NextResponse: {
-    json: jest.fn((data, options) => ({ data, options })),
+    json: jest.fn((data: any, options?: any) => ({ data, options })),
   },
 }));
 
@@ -201,6 +210,37 @@ describe("Ask API Route", () => {
         { error: errorMessage },
         { status: 500 }
       );
+    });
+
+    it("handles empty response from GPT-4", async () => {
+      const mockRequest = {
+        json: jest.fn().mockResolvedValueOnce({
+          model: "GPT-4",
+          query: "What is AI?",
+        }),
+      };
+
+      // Set up OpenAI mock to return empty content
+      openaiMock.chat.completions.create.mockResolvedValueOnce({
+        choices: [
+          {
+            message: {
+              content: null, // This will test the fallback to empty string
+            },
+          },
+        ],
+      });
+
+      const response = await POST(mockRequest as unknown as Request);
+
+      expect(NextResponse.json).toHaveBeenCalledWith({
+        response: "", // Empty string due to fallback
+        id: "GPT-4",
+        name: "GPT-4",
+        provider: "OpenAI",
+        version: "gpt-4",
+        description: "Most capable OpenAI model",
+      });
     });
 
     it("ensures complete switch case coverage", async () => {
@@ -500,6 +540,49 @@ describe("Ask API Route", () => {
         version: "claude-3-opus-20240229",
         description: "Latest Claude model",
       });
+    });
+
+    it("directly targets default case in switch statement", async () => {
+      // We need to bypass the initial modelInfo check but hit the default case
+
+      // Create a copy of the original MODELS object to restore later
+      const originalModels = { ...MODELS };
+
+      try {
+        // Add a test model to MODELS object
+        (MODELS as any).TestModel = {
+          id: "TestModel",
+          name: "Test Model",
+          provider: "Test",
+          version: "test-1.0",
+          description: "Test model",
+        };
+
+        // Create a request with our test model
+        const mockRequest = {
+          json: jest.fn().mockResolvedValue({
+            model: "TestModel", // Will pass the modelInfo check
+            query: "Test query",
+          }),
+        };
+
+        // Execute the request
+        const response = await POST(mockRequest as unknown as Request);
+
+        // In our Jest mocks, NextResponse.json returns {data, options} rather than a real Response
+        // So we need to check the data and options directly
+        expect((response as any).data).toEqual({
+          error: "Model not supported",
+        });
+        expect((response as any).options).toEqual({ status: 400 });
+      } finally {
+        // Clean up - restore the original MODELS object
+        Object.keys(MODELS).forEach((key) => {
+          if (!originalModels[key as keyof typeof MODELS]) {
+            delete (MODELS as any)[key];
+          }
+        });
+      }
     });
   });
 });
